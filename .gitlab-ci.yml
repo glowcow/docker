@@ -1,0 +1,19 @@
+stages:
+  - image
+
+build custom image:
+  stage: image
+  image: docker:20.10.17
+  rules:
+    - if: $CI_COMMIT_REF_NAME =~ "master" && $BUILD && $TAG
+      variables:
+        DOCKERFILE: dockerfiles/$BUILD/Dockerfile
+        IMAGE: $DOCKERHUB_USERNAME/$BUILD:$TAG
+        DOCKER_CONTEXT: dockerfiles/$BUILD
+  before_script:
+    - docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_TOKEN
+  script:
+    - echo $IMAGE
+    - docker build -f $DOCKERFILE --network=host -t $IMAGE $DOCKER_CONTEXT
+    - docker push $IMAGE
+    - docker rmi $IMAGE
