@@ -7,8 +7,8 @@ To build a new image:
 
 Enter two mandatory variables:
 
-* **BUILD** - This is repo name on Docker Hub same as subdirectory under dockerfiles (e.g debug_tools).
-* **TAG** - New tag for image (e.g 0.1).
+* **BUILD** - This is repo name on Docker Hub same as subdirectory under dockerfiles (e.g. *debug_tools*).
+* **TAG** - New tag for image (e.g. *0.1*).
 
 ### Kubernetes example
 ```
