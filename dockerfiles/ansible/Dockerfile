@@ -7,6 +7,7 @@ FROM python:3.8-slim-bullseye AS stage-2
 WORKDIR /ansible
 ENV PYTHONUNBUFFERED=1
 ENV ANSIBLE_CONFIG=./ansible.cfg
+ENV ANSIBLE_FORCE_COLOR=true
 COPY --from=stage-1 /builder/wheels /wheels
 RUN apt-get update \
     && apt-get install -y sshpass \
