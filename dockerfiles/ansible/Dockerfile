@@ -10,7 +10,7 @@ ENV ANSIBLE_CONFIG=./ansible.cfg
 ENV ANSIBLE_FORCE_COLOR=true
 COPY --from=stage-1 /builder/wheels /wheels
 RUN apt-get update \
-    && apt-get install -y sshpass \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y sshpass \
     && rm -rf /var/lib/apt/lists/* \
     && ln -sf /usr/share/zoneinfo/Europe/Moscow /etc/localtime \
     && echo "Europe/Moscow" > /etc/timezone \

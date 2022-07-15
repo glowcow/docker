@@ -14,6 +14,6 @@ build custom image:
     - docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_TOKEN
   script:
     - echo $IMAGE
-    - docker build -f $DOCKERFILE --network=host -t $IMAGE $DOCKER_CONTEXT
+    - docker build -f $DOCKERFILE --network=host --build-arg TAG=$TAG -t $IMAGE $DOCKER_CONTEXT 
     - docker push $IMAGE
     - docker rmi $IMAGE
