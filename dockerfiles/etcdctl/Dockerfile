@@ -1,4 +1,5 @@
 FROM debian:bullseye-slim
+WORKDIR /etcdctl
 ARG TZ=Europe/Moscow
 ARG TAG
 ARG ETCD_VER=${TAG}
