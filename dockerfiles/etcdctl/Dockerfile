@@ -1,4 +1,5 @@
 FROM debian:bullseye-slim
+ARG TZ=Europe/Moscow
 ARG TAG
 ARG ETCD_VER=${TAG}
 ARG GOOGLE_URL=https://storage.googleapis.com/etcd
@@ -8,8 +9,8 @@ ARG DOWNLOAD_URL=${GOOGLE_URL}
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y curl \
     && rm -rf /var/lib/apt/lists/* \
-    && ln -sf /usr/share/zoneinfo/Europe/Moscow /etc/localtime \
-    && echo "Europe/Moscow" > /etc/timezone \
+    && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime \
+    && echo ${TZ} > /etc/timezone \
     && dpkg-reconfigure -f noninteractive tzdata \
     && rm -f /tmp/etcd-v${ETCD_VER}-linux-amd64.tar.gz \
     && rm -rf /tmp/etcd-download-test && mkdir -p /tmp/etcd-download-test \
