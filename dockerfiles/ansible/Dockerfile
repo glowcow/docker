@@ -9,6 +9,7 @@ ARG TZ=Europe/Moscow
 ENV PYTHONUNBUFFERED=1
 ENV ANSIBLE_CONFIG=./ansible.cfg
 ENV ANSIBLE_FORCE_COLOR=true
+ENV ANSIBLE_HOST_KEY_CHECKING=false
 ENV ANSIBLE_COLLECTIONS_PATH=/usr/share/ansible/collections
 ENV ANSIBLE_LIBRARY=/usr/share/ansible/plugins/modules
 COPY --from=stage-1 /builder/wheels /wheels
