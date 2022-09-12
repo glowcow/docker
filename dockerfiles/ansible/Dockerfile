@@ -21,5 +21,5 @@ RUN apt-get update \
     && dpkg-reconfigure -f noninteractive tzdata \
     && mkdir -m 600 ~/.ssh \
     && pip3 install --no-cache /wheels/* \
-    && ansible-galaxy collection install community.general
+    && ansible-galaxy collection install community.general ansible.posix
 CMD ["/usr/bin/tail", "-f", "/dev/null"]
