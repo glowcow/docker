@@ -1,21 +1,45 @@
 version: "3.9"
+
+x-var:
+  dashboard:
+    &dashboard
+    image: pawelmalak/flame:2.3.0
+    environment:
+      PASSWORD: "admin"
+  grafana:
+    &grafana
+    image: grafana/grafana-oss:9.1.4
+  loki:
+    &loki
+    image: grafana/loki:2.6.1
+  prometheus:
+    &prometheus
+    image: prom/prometheus:v2.37.1
+  black_box_exporter:
+    &black_box_exporter
+    image: prom/blackbox-exporter:v0.22.0
+  nginx:
+    &nginx
+    image: nginx:1.23.1
+  gitlab_runner:
+    &gitlab_runner
+    image: gitlab/gitlab-runner:v15.3.0
+
 services:
   dashboard:
-    image: pawelmalak/flame:2.3.0
+    <<: *dashboard
     container_name: pi_dashboard_dc
     restart: unless-stopped
     volumes:
       - /docker_apps/flame:/app/data
-    environment:
-      PASSWORD: ""
   grafana:
-    image: grafana/grafana-oss:9.1.4
+    <<: *grafana
     container_name: grafana_dc
     restart: unless-stopped
     volumes:
       - /docker_apps/grafana:/var/lib/grafana
   loki:
-    image: grafana/loki:2.6.1
+    <<: *loki
     container_name: loki_dc
     restart: unless-stopped
     command:
@@ -25,7 +49,7 @@ services:
     ports:
       - 3100:3100
   prometheus:
-    image: prom/prometheus:v2.37.1
+    <<: *prometheus
     container_name: prometheus_dc
     restart: unless-stopped
     command:
@@ -38,13 +62,13 @@ services:
       - /docker_apps/prometheus/tsdb:/tsdb
       - /docker_apps/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
   black_box_exporter:
-    image: prom/blackbox-exporter:v0.22.0
+    <<: *black_box_exporter
     container_name: black_box_exporter_dc
     restart: unless-stopped
     volumes:
       - /docker_apps/bbexporter:/config/
   nginx:
-    image: nginx:1.23.1
+    <<: *nginx
     container_name: nginx_dc
     restart: unless-stopped
     volumes:
@@ -55,12 +79,13 @@ services:
       - 80:80
       - 443:443
   gitlab_runner:
-    image: gitlab/gitlab-runner:v15.3.0
+    <<: *gitlab_runner
     container_name: gitlab_runner_dc
     restart: unless-stopped
     volumes:
       - /docker_apps/gitlab_runner:/etc/gitlab-runner
       - /var/run/docker.sock:/var/run/docker.sock
+
 networks:
   default:
     name: pi_services_net
