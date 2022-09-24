@@ -1,0 +1,67 @@
+version: "3.9"
+services:
+  dashboard:
+    image: pawelmalak/flame:2.3.0
+    container_name: pi_dashboard_dc
+    restart: unless-stopped
+    volumes:
+      - /docker_apps/flame:/app/data
+    environment:
+      PASSWORD: ""
+  grafana:
+    image: grafana/grafana-oss:9.1.4
+    container_name: grafana_dc
+    restart: unless-stopped
+    volumes:
+      - /docker_apps/grafana:/var/lib/grafana
+  loki:
+    image: grafana/loki:2.6.1
+    container_name: loki_dc
+    restart: unless-stopped
+    command:
+      - "-config.file=/var/lib/loki/loki.yml"
+    volumes:
+      - /docker_apps/loki:/var/lib/loki
+    ports:
+      - 3100:3100
+  prometheus:
+    image: prom/prometheus:v2.37.1
+    container_name: prometheus_dc
+    restart: unless-stopped
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/tsdb"
+      - "--storage.tsdb.retention.time=90d"
+      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+      - "--web.console.templates=/usr/share/prometheus/consoles"
+    volumes:
+      - /docker_apps/prometheus/tsdb:/tsdb
+      - /docker_apps/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+  black_box_exporter:
+    image: prom/blackbox-exporter:v0.22.0
+    container_name: black_box_exporter_dc
+    restart: unless-stopped
+    volumes:
+      - /docker_apps/bbexporter:/config/
+  nginx:
+    image: nginx:1.23.1
+    container_name: nginx_dc
+    restart: unless-stopped
+    volumes:
+      - /docker_apps/nginx/conf:/etc/nginx/conf.d
+      - /docker_apps/nginx/cert:/cert
+      - /docker_apps/nginx/ssl-conf:/ssl-conf
+    ports:
+      - 80:80
+      - 443:443
+  gitlab_runner:
+    image: gitlab/gitlab-runner:v15.3.0
+    container_name: gitlab_runner_dc
+    restart: unless-stopped
+    volumes:
+      - /docker_apps/gitlab_runner:/etc/gitlab-runner
+      - /var/run/docker.sock:/var/run/docker.sock
+networks:
+  default:
+    name: pi_services_net
+    driver: bridge
