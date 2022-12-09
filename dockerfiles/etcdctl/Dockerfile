@@ -1,6 +1,6 @@
 FROM debian:bullseye-slim
 WORKDIR /etcdctl
-ARG TZ=Europe/Moscow
+ARG TZ=Asia/Jerusalem
 ARG TAG
 ARG ETCD_VER=${TAG}
 ARG GOOGLE_URL=https://storage.googleapis.com/etcd
