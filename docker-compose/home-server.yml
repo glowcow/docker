@@ -8,22 +8,22 @@ x-var:
       PASSWORD: "admin"
   grafana:
     &grafana
-    image: grafana/grafana-oss:9.2.6
+    image: grafana/grafana-oss:9.3.2
   loki:
     &loki
-    image: grafana/loki:2.7.0
+    image: grafana/loki:2.7.1
   prometheus:
     &prometheus
-    image: prom/prometheus:v2.40.3
+    image: prom/prometheus:v2.40.7
   black_box_exporter:
     &black_box_exporter
-    image: prom/blackbox-exporter:v0.22.0
+    image: prom/blackbox-exporter:v0.23.0
   nginx:
     &nginx
-    image: nginx:1.23.2
+    image: nginx:1.23.3
   gitlab_runner:
     &gitlab_runner
-    image: gitlab/gitlab-runner:v15.6.1
+    image: gitlab/gitlab-runner:v15.7.0
 
 services:
   dashboard:
