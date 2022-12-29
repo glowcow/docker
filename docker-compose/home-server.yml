@@ -18,9 +18,12 @@ x-var:
   black_box_exporter:
     &black_box_exporter
     image: prom/blackbox-exporter:v0.23.0
-  nginx:
-    &nginx
-    image: nginx:1.23.3
+  traefik:
+    &traefik
+    image: traefik:v2.9
+#  nginx:
+#    &nginx
+#    image: nginx:1.23.3
   gitlab_runner:
     &gitlab_runner
     image: gitlab/gitlab-runner:v15.7.0
@@ -32,12 +35,34 @@ services:
     restart: unless-stopped
     volumes:
       - /docker_apps/flame:/app/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.entrypoints=web"
+      - "traefik.http.routers.dashboard.rule=Host(`pi.glowcow.xyz`)"
+      - "traefik.http.routers.dashboard.middlewares=https-redirect"
+      - "traefik.http.routers.dashboard-secure.entrypoints=websecure"
+      - "traefik.http.routers.dashboard-secure.rule=Host(`pi.glowcow.xyz`)"
+      - "traefik.http.routers.dashboard-secure.tls=true"
+      - "traefik.http.routers.dashboard-secure.tls.certresolver=wildcard-godaddy"
+      - "traefik.http.routers.dashboard-secure.tls.domains[0].main=pi.glowcow.xyz"
+      - "traefik.http.routers.dashboard-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
   grafana:
     <<: *grafana
     container_name: grafana_dc
     restart: unless-stopped
     volumes:
       - /docker_apps/grafana:/var/lib/grafana
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.grafana.entrypoints=web"
+      - "traefik.http.routers.grafana.rule=Host(`grafana.pi.glowcow.xyz`)"
+      - "traefik.http.routers.grafana.middlewares=https-redirect"
+      - "traefik.http.routers.grafana-secure.entrypoints=websecure"
+      - "traefik.http.routers.grafana-secure.rule=Host(`grafana.pi.glowcow.xyz`)"
+      - "traefik.http.routers.grafana-secure.tls=true"
+      - "traefik.http.routers.grafana-secure.tls.certresolver=wildcard-godaddy"
+      - "traefik.http.routers.grafana-secure.tls.domains[0].main=pi.glowcow.xyz"
+      - "traefik.http.routers.grafana-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
   loki:
     <<: *loki
     container_name: loki_dc
@@ -61,23 +86,90 @@ services:
     volumes:
       - /docker_apps/prometheus/tsdb:/tsdb
       - /docker_apps/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.prometheus.entrypoints=web"
+      - "traefik.http.routers.prometheus.rule=Host(`prom.pi.glowcow.xyz`)"
+      - "traefik.http.routers.prometheus.middlewares=https-redirect"
+      - "traefik.http.routers.prometheus-secure.entrypoints=websecure"
+      - "traefik.http.routers.prometheus-secure.rule=Host(`prom.pi.glowcow.xyz`)"
+      - "traefik.http.routers.prometheus-secure.tls=true"
+      - "traefik.http.routers.prometheus-secure.tls.certresolver=wildcard-godaddy"
+      - "traefik.http.routers.prometheus-secure.tls.domains[0].main=pi.glowcow.xyz"
+      - "traefik.http.routers.prometheus-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
   black_box_exporter:
     <<: *black_box_exporter
     container_name: black_box_exporter_dc
     restart: unless-stopped
     volumes:
       - /docker_apps/bbexporter:/config/
-  nginx:
-    <<: *nginx
-    container_name: nginx_dc
-    restart: unless-stopped
-    volumes:
-      - /docker_apps/nginx/conf:/etc/nginx/conf.d
-      - /docker_apps/nginx/cert:/cert
-      - /docker_apps/nginx/ssl-conf:/ssl-conf
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.bbox.entrypoints=web"
+      - "traefik.http.routers.bbox.rule=Host(`bbexporter.pi.glowcow.xyz`)"
+      - "traefik.http.routers.bbox.middlewares=https-redirect"
+      - "traefik.http.routers.bbox-secure.entrypoints=websecure"
+      - "traefik.http.routers.bbox-secure.rule=Host(`bbexporter.pi.glowcow.xyz`)"
+      - "traefik.http.routers.bbox-secure.tls=true"
+      - "traefik.http.routers.bbox-secure.tls.certresolver=wildcard-godaddy"
+      - "traefik.http.routers.bbox-secure.tls.domains[0].main=pi.glowcow.xyz"
+      - "traefik.http.routers.bbox-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
+  traefik:
+    <<: *traefik
+    container_name: traefik_dc
+    env_file:
+      - .godaddy.env
+    command:
+      #- "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entryPoints.websecure.address=:443"
+      - "--providers.file.filename=/etc/traefik/dynamic.yml"
+      - "--serversTransport.insecureSkipVerify=true"
+      - "--metrics.prometheus=true"
+      # ACME V2 supports wildcard certificates.
+      # Wildcard certificates can only be generated through a DNS-01 challenge.
+      - "--certificatesresolvers.wildcard-godaddy.acme.tlschallenge=false"
+      - "--certificatesResolvers.wildcard-godaddy.acme.dnsChallenge.provider=godaddy"
+      - "--certificatesResolvers.wildcard-godaddy.acme.dnsChallenge.delayBeforeCheck=0"
+      # Email address used for registration.
+      - "--certificatesresolvers.wildcard-godaddy.acme.email=glowcow@gmail.com"
+      # Certificates storage
+      - "--certificatesresolvers.wildcard-godaddy.acme.storage=/tls-certificates/acme.json"
     ports:
       - 80:80
       - 443:443
+      - 8080:8080
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "/docker_apps/traefik/certs:/tls-certificates"
+      - "/docker_apps/traefik/dynamic.yml:/etc/traefik/dynamic.yml"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.entrypoints=web"
+      - "traefik.http.routers.traefik.rule=Host(`tf.pi.glowcow.xyz`)"
+      - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.traefik.middlewares=https-redirect"
+      - "traefik.http.routers.traefik-secure.entrypoints=websecure"
+      - "traefik.http.routers.traefik-secure.rule=Host(`tf.pi.glowcow.xyz`)"
+      - "traefik.http.routers.traefik-secure.tls=true"
+      - "traefik.http.routers.traefik-secure.tls.certresolver=wildcard-godaddy"
+      - "traefik.http.routers.traefik-secure.tls.domains[0].main=pi.glowcow.xyz"
+      - "traefik.http.routers.traefik-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
+      - "traefik.http.routers.traefik-secure.service=api@internal"
+#  nginx:
+#    <<: *nginx
+#    container_name: nginx_dc
+#    restart: unless-stopped
+#    volumes:
+#      - /docker_apps/nginx/conf:/etc/nginx/conf.d
+#      - /docker_apps/nginx/cert:/cert
+#      - /docker_apps/nginx/ssl-conf:/ssl-conf
+#    ports:
+#      - 80:80
+#      - 443:443
   gitlab_runner:
     <<: *gitlab_runner
     container_name: gitlab_runner_dc
