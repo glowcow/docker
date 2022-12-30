@@ -18,9 +18,12 @@ x-var:
   black_box_exporter:
     &black_box_exporter
     image: prom/blackbox-exporter:v0.23.0
+  snmp_exporter:
+    &snmp_exporter
+    image: prom/snmp-exporter:v0.21.0
   traefik:
     &traefik
-    image: traefik:v2.9
+    image: traefik:v2.9.6
 #  nginx:
 #    &nginx
 #    image: nginx:1.23.3
@@ -114,6 +117,25 @@ services:
       - "traefik.http.routers.bbox-secure.tls.certresolver=wildcard-godaddy"
       - "traefik.http.routers.bbox-secure.tls.domains[0].main=pi.glowcow.xyz"
       - "traefik.http.routers.bbox-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
+  snmp_exporter:
+    <<: *snmp_exporter
+    container_name: snmp_exporter_dc
+    restart: unless-stopped
+    command:
+      - "--config.file=/etc/snmp_exporter/snmp.yml"
+    volumes:
+      - /docker_apps/snmp_exporter/snmp.yml:/etc/snmp_exporter/snmp.yml
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.snmp.entrypoints=web"
+      - "traefik.http.routers.snmp.rule=Host(`snmp.pi.glowcow.xyz`)"
+      - "traefik.http.routers.snmp.middlewares=https-redirect"
+      - "traefik.http.routers.snmp-secure.entrypoints=websecure"
+      - "traefik.http.routers.snmp-secure.rule=Host(`snmp.pi.glowcow.xyz`)"
+      - "traefik.http.routers.snmp-secure.tls=true"
+      - "traefik.http.routers.snmp-secure.tls.certresolver=wildcard-godaddy"
+      - "traefik.http.routers.snmp-secure.tls.domains[0].main=pi.glowcow.xyz"
+      - "traefik.http.routers.snmp-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
   traefik:
     <<: *traefik
     container_name: traefik_dc
@@ -152,6 +174,7 @@ services:
       - grafana
       - prometheus
       - black_box_exporter
+      - snmp_exporter
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.entrypoints=web"
