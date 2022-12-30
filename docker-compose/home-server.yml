@@ -6,6 +6,9 @@ x-var:
     image: pawelmalak/flame:2.3.0
     environment:
       PASSWORD: "admin"
+  uptime-kuma:
+    &uptime-kuma
+    image: louislam/uptime-kuma:1.19.2
   grafana:
     &grafana
     image: grafana/grafana-oss:9.3.2
@@ -49,6 +52,24 @@ services:
       - "traefik.http.routers.dashboard-secure.tls.certresolver=wildcard-godaddy"
       - "traefik.http.routers.dashboard-secure.tls.domains[0].main=pi.glowcow.xyz"
       - "traefik.http.routers.dashboard-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
+  uptime-kuma:
+    <<: *uptime-kuma
+    container_name: kuma_dc
+    restart: unless-stopped
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - /docker_apps/kuma:/app/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.kuma.entrypoints=web"
+      - "traefik.http.routers.kuma.rule=Host(`kuma.pi.glowcow.xyz`)"
+      - "traefik.http.routers.kuma.middlewares=https-redirect"
+      - "traefik.http.routers.kuma-secure.entrypoints=websecure"
+      - "traefik.http.routers.kuma-secure.rule=Host(`kuma.pi.glowcow.xyz`)"
+      - "traefik.http.routers.kuma-secure.tls=true"
+      - "traefik.http.routers.kuma-secure.tls.certresolver=wildcard-godaddy"
+      - "traefik.http.routers.kuma-secure.tls.domains[0].main=pi.glowcow.xyz"
+      - "traefik.http.routers.kuma-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
   grafana:
     <<: *grafana
     container_name: grafana_dc
@@ -175,6 +196,7 @@ services:
       - prometheus
       - black_box_exporter
       - snmp_exporter
+      - uptime-kuma
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.entrypoints=web"
