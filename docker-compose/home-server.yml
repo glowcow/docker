@@ -117,6 +117,7 @@ services:
   traefik:
     <<: *traefik
     container_name: traefik_dc
+    restart: unless-stopped
     env_file:
       - .godaddy.env
     command:
@@ -146,6 +147,11 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "/docker_apps/traefik/certs:/tls-certificates"
       - "/docker_apps/traefik/dynamic.yml:/etc/traefik/dynamic.yml"
+    depends_on:
+      - dashboard
+      - grafana
+      - prometheus
+      - black_box_exporter
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.entrypoints=web"
