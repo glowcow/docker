@@ -8,7 +8,7 @@ x-var:
       PASSWORD: "admin"
   uptime-kuma:
     &uptime-kuma
-    image: louislam/uptime-kuma:1.19.2
+    image: louislam/uptime-kuma:1.19.6
   grafana:
     &grafana
     image: grafana/grafana-oss:9.3.2
@@ -32,7 +32,7 @@ x-var:
 #    image: nginx:1.23.3
   gitlab_runner:
     &gitlab_runner
-    image: gitlab/gitlab-runner:v15.7.0
+    image: gitlab/gitlab-runner:v15.8.0
 
 services:
   dashboard:
