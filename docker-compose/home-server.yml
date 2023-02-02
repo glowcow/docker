@@ -11,7 +11,7 @@ x-var:
     image: louislam/uptime-kuma:1.19.6
   grafana:
     &grafana
-    image: grafana/grafana-oss:9.3.2
+    image: grafana/grafana-oss:9.3.6
   prometheus:
     &prometheus
     image: prom/prometheus:v2.40.7
@@ -23,7 +23,7 @@ x-var:
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
   graylog:
     &graylog
-    image: graylog/graylog:5.0.2
+    image: graylog/graylog:5.0.3
   black_box_exporter:
     &black_box_exporter
     image: prom/blackbox-exporter:v0.23.0
