@@ -6,6 +6,7 @@ RUN pip3 wheel --no-cache-dir --no-deps --wheel-dir /builder/wheels -r requireme
 FROM python:3.9-slim-bullseye AS stage-2
 WORKDIR /ansible
 ARG TZ=Asia/Jerusalem
+ARG ANSIBLE_EXTRA_COLLECTIONS="community.general ansible.posix"
 ENV PYTHONUNBUFFERED=1
 ENV ANSIBLE_CONFIG=./ansible.cfg
 ENV ANSIBLE_FORCE_COLOR=true
@@ -21,5 +22,5 @@ RUN apt-get update \
     && dpkg-reconfigure -f noninteractive tzdata \
     && mkdir -m 600 ~/.ssh \
     && pip3 install --no-cache /wheels/* \
-    && ansible-galaxy collection install community.general ansible.posix
+    && ansible-galaxy collection install ${ANSIBLE_EXTRA_COLLECTIONS}
 CMD ["/usr/bin/tail", "-f", "/dev/null"]
