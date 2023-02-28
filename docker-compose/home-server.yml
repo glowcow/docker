@@ -8,16 +8,16 @@ x-var:
       PASSWORD: "admin"
   uptime-kuma:
     &uptime-kuma
-    image: louislam/uptime-kuma:1.19.6
+    image: louislam/uptime-kuma:1.20.2
   grafana:
     &grafana
-    image: grafana/grafana-oss:9.3.6
-  prometheus:
-    &prometheus
-    image: prom/prometheus:v2.40.7
+    image: grafana/grafana-oss:9.3.8
+  victoriametrics:
+    &victoriametrics
+    image: victoriametrics/victoria-metrics:v1.87.2
   mongo:
     &mongo
-    image: mongo:5.0.14
+    image: mongo:5.0.15
   elasticsearch:
     &elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
@@ -35,7 +35,7 @@ x-var:
     image: traefik:v2.9.8
   gitlab_runner:
     &gitlab_runner
-    image: gitlab/gitlab-runner:v15.8.2
+    image: gitlab/gitlab-runner:v15.8.3
 
 services:
   dashboard:
@@ -77,8 +77,10 @@ services:
     <<: *grafana
     container_name: grafana_dc
     restart: unless-stopped
+    environment:
+      - GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=victoriametrics-datasource
     depends_on:
-      - prometheus
+      - victoriametrics
       - elasticsearch
     volumes:
       - /docker_apps/grafana:/var/lib/grafana
@@ -93,30 +95,31 @@ services:
       - "traefik.http.routers.grafana-secure.tls.certresolver=wildcard-godaddy"
       - "traefik.http.routers.grafana-secure.tls.domains[0].main=pi.glowcow.xyz"
       - "traefik.http.routers.grafana-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
-  prometheus:
-    <<: *prometheus
-    container_name: prometheus_dc
-    restart: unless-stopped
-    command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
-      - "--storage.tsdb.path=/tsdb"
-      - "--storage.tsdb.retention.time=90d"
-      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
-      - "--web.console.templates=/usr/share/prometheus/consoles"
+  victoriametrics:
+    container_name: victoriametrics_dc
+    <<: *victoriametrics
+    ports:
+      - 8428:8428
     volumes:
-      - /docker_apps/prometheus/tsdb:/tsdb
-      - /docker_apps/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - /docker_apps/victoriametrics/data:/storage
+      - /docker_apps/victoriametrics/scrape.yaml:/etc/vm/scrape.yaml
+    command:
+      - "--storageDataPath=/storage"
+      - "--httpListenAddr=:8428"
+      - "--retentionPeriod=6"
+      - "--promscrape.config=/etc/vm/scrape.yaml"
+    restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.prometheus.entrypoints=web"
-      - "traefik.http.routers.prometheus.rule=Host(`prom.pi.glowcow.xyz`)"
-      - "traefik.http.routers.prometheus.middlewares=https-redirect"
-      - "traefik.http.routers.prometheus-secure.entrypoints=websecure"
-      - "traefik.http.routers.prometheus-secure.rule=Host(`prom.pi.glowcow.xyz`)"
-      - "traefik.http.routers.prometheus-secure.tls=true"
-      - "traefik.http.routers.prometheus-secure.tls.certresolver=wildcard-godaddy"
-      - "traefik.http.routers.prometheus-secure.tls.domains[0].main=pi.glowcow.xyz"
-      - "traefik.http.routers.prometheus-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
+      - "traefik.http.routers.victoriametrics.entrypoints=web"
+      - "traefik.http.routers.victoriametrics.rule=Host(`vm.pi.glowcow.xyz`)"
+      - "traefik.http.routers.victoriametrics.middlewares=https-redirect"
+      - "traefik.http.routers.victoriametrics-secure.entrypoints=websecure"
+      - "traefik.http.routers.victoriametrics-secure.rule=Host(`vm.pi.glowcow.xyz`)"
+      - "traefik.http.routers.victoriametrics-secure.tls=true"
+      - "traefik.http.routers.victoriametrics-secure.tls.certresolver=wildcard-godaddy"
+      - "traefik.http.routers.victoriametrics-secure.tls.domains[0].main=pi.glowcow.xyz"
+      - "traefik.http.routers.victoriametrics-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
   mongo:
     <<: *mongo
     container_name: mongo_dc
@@ -243,7 +246,7 @@ services:
     depends_on:
       - dashboard
       - grafana
-      - prometheus
+      - victoriametrics
       - black_box_exporter
       - snmp_exporter
       - uptime-kuma
