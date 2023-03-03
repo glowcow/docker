@@ -145,6 +145,7 @@ services:
       - /docker_apps/es:/usr/share/elasticsearch/data
   elasticsearch_exporter:
       <<: *elasticsearch_exporter
+      container_name: elasticsearch_exporter_dc
       command:
        - '--es.uri=http://elasticsearch:9200'
       restart: unless-stopped
