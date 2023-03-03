@@ -11,19 +11,22 @@ x-var:
     image: louislam/uptime-kuma:1.20.2
   grafana:
     &grafana
-    image: grafana/grafana-oss:9.3.8
+    image: grafana/grafana-oss:9.4.3
   victoriametrics:
     &victoriametrics
-    image: victoriametrics/victoria-metrics:v1.87.2
+    image: victoriametrics/victoria-metrics:v1.88.1
   mongo:
     &mongo
     image: mongo:5.0.15
   elasticsearch:
     &elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
+  elasticsearch_exporter:
+    &elasticsearch_exporter
+    image: quay.io/prometheuscommunity/elasticsearch-exporter:v1.5.0
   graylog:
     &graylog
-    image: graylog/graylog:5.0.3
+    image: graylog/graylog:5.0.4
   black_box_exporter:
     &black_box_exporter
     image: prom/blackbox-exporter:v0.23.0
@@ -140,6 +143,13 @@ services:
       - 9200:9200
     volumes:
       - /docker_apps/es:/usr/share/elasticsearch/data
+  elasticsearch_exporter:
+      <<: *elasticsearch_exporter
+      command:
+       - '--es.uri=http://elasticsearch:9200'
+      restart: unless-stopped
+      ports:
+      - 9114:9114
   graylog:
     <<: *graylog
     container_name: graylog_dc
