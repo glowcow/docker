@@ -39,6 +39,12 @@ x-var:
   gitlab_runner:
     &gitlab_runner
     image: gitlab/gitlab-runner:v15.8.3
+  samba:
+    &samba
+    image: glowcow/samba:4.13.13
+  transmission:
+    &transmission
+    image: glowcow/transmission:3.00-1
 
 services:
   dashboard:
@@ -101,8 +107,6 @@ services:
   victoriametrics:
     container_name: victoriametrics_dc
     <<: *victoriametrics
-    ports:
-      - 8428:8428
     volumes:
       - /docker_apps/victoriametrics/data:/storage
       - /docker_apps/victoriametrics/scrape.yaml:/etc/vm/scrape.yaml
@@ -112,6 +116,10 @@ services:
       - "--retentionPeriod=6"
       - "--promscrape.config=/etc/vm/scrape.yaml"
     restart: unless-stopped
+    depends_on:
+      - elasticsearch_exporter
+      - black_box_exporter
+      - snmp_exporter
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.victoriametrics.entrypoints=web"
@@ -133,14 +141,11 @@ services:
     <<: *elasticsearch
     container_name: elasticsearch_dc
     restart: unless-stopped
-    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
     environment:
       - http.host=0.0.0.0
       - transport.host=localhost
       - network.host=0.0.0.0
       - "ES_JAVA_OPTS=-Dlog4j2.formatMsgNoLookups=true -Xms512m -Xmx512m"
-    ports:
-      - 9200:9200
     volumes:
       - /docker_apps/es:/usr/share/elasticsearch/data
   elasticsearch_exporter:
@@ -149,8 +154,6 @@ services:
       command:
        - '--es.uri=http://elasticsearch:9200'
       restart: unless-stopped
-      ports:
-      - 9114:9114
   graylog:
     <<: *graylog
     container_name: graylog_dc
@@ -232,7 +235,7 @@ services:
       - "--api.insecure=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
-      - "--accesslog=true"
+      - "--accesslog=false"
       - "--accesslog.format=json"
       - "--accesslog.filepath=/dev/stdout"
       - "--entrypoints.web.address=:80"
@@ -264,6 +267,7 @@ services:
       - black_box_exporter
       - snmp_exporter
       - uptime-kuma
+      - transmission
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.entrypoints=web"
@@ -284,6 +288,37 @@ services:
     volumes:
       - /docker_apps/gitlab_runner:/etc/gitlab-runner
       - /var/run/docker.sock:/var/run/docker.sock
+  samba:
+    <<: *samba
+    container_name: samba_dc
+    restart: unless-stopped
+    ports:
+      - 137:137
+      - 138:138
+      - 139:139
+      - 445:445
+    volumes:
+      - /docker_apps/samba/private/:/var/lib/samba/private/
+      - /docker_apps/samba/config/:/etc/samba/
+      - /NAS/:/NAS/
+  transmission:
+    <<: *transmission
+    container_name: transmission_dc
+    restart: unless-stopped
+    volumes:
+      - /docker_apps/transmission/:/etc/transmission-daemon/
+      - /NAS/Downloads/:/Downloads/
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.tm.entrypoints=web"
+      - "traefik.http.routers.tm.rule=Host(`tm.pi.glowcow.xyz`)"
+      - "traefik.http.routers.tm.middlewares=https-redirect"
+      - "traefik.http.routers.tm-secure.entrypoints=websecure"
+      - "traefik.http.routers.tm-secure.rule=Host(`tm.pi.glowcow.xyz`)"
+      - "traefik.http.routers.tm-secure.tls=true"
+      - "traefik.http.routers.tm-secure.tls.certresolver=wildcard-godaddy"
+      - "traefik.http.routers.tm-secure.tls.domains[0].main=pi.glowcow.xyz"
+      - "traefik.http.routers.tm-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
 
 networks:
   default:
