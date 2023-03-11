@@ -10,6 +10,6 @@ RUN apt-get update \
     && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime \
     && echo ${TZ} > /etc/timezone \
     && dpkg-reconfigure -f noninteractive tzdata
-EXPOSE 137/udp 138/udp 139 445
+EXPOSE 137 138 139 445
 
 CMD ["/usr/sbin/smbd", "--foreground", "--no-process-group", "--log-stdout", "--configfile", "/etc/samba/smb.conf"]
