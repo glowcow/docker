@@ -11,7 +11,7 @@ x-var:
     image: louislam/uptime-kuma:1.20.2
   grafana:
     &grafana
-    image: grafana/grafana-oss:9.4.3
+    image: grafana/grafana-oss:9.4.7
   victoriametrics:
     &victoriametrics
     image: victoriametrics/victoria-metrics:v1.88.1
@@ -35,10 +35,10 @@ x-var:
     image: prom/snmp-exporter:v0.21.0
   traefik:
     &traefik
-    image: traefik:v2.9.8
+    image: traefik:v2.9.9
   gitlab_runner:
     &gitlab_runner
-    image: gitlab/gitlab-runner:v15.8.3
+    image: gitlab/gitlab-runner:v15.9.1
   samba:
     &samba
     image: glowcow/samba:4.13.13
