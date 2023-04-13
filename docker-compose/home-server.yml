@@ -44,6 +44,9 @@ x-var:
   snmp_exporter:
     &snmp_exporter
     image: prom/snmp-exporter:v0.21.0
+  cadvisor:
+    &cadvisor
+    image: gcr.io/cadvisor/cadvisor-amd64:v0.47.1
   traefik:
     &traefik
     image: traefik:v2.9.10
@@ -131,6 +134,8 @@ services:
       - "--httpListenAddr=:8428"
       - "--retentionPeriod=6"
       - "--promscrape.config=/etc/vm/scrape.yaml"
+      - "--promscrape.maxScrapeSize=33554432"
+      - "--maxLabelsPerTimeseries=60"
     depends_on:
       - elasticsearch_exporter
       - black_box_exporter
@@ -245,6 +250,16 @@ services:
       - "traefik.http.routers.snmp-secure.tls.certresolver=wildcard-godaddy"
       - "traefik.http.routers.snmp-secure.tls.domains[0].main=pi.glowcow.xyz"
       - "traefik.http.routers.snmp-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
+  cadvisor:
+    <<:
+      - *cadvisor
+      - *resources
+    container_name: cadvisor_dc
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
   traefik:
     <<:
       - *traefik
@@ -260,6 +275,7 @@ services:
       - "--accesslog=false"
       - "--accesslog.format=json"
       - "--accesslog.filepath=/dev/stdout"
+      - "--entrypoints.traefik.address=:8888"
       - "--entrypoints.web.address=:80"
       - "--entryPoints.websecure.address=:443"
       - "--providers.file.filename=/etc/traefik/dynamic.yml"
@@ -277,7 +293,7 @@ services:
     ports:
       - 80:80
       - 443:443
-      - 8080:8080
+      - 8888:8888
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "/docker_apps/traefik/certs:/tls-certificates"
