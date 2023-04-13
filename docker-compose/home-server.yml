@@ -1,6 +1,17 @@
 version: "3.9"
 
 x-var:
+  resources:
+    &resources
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2048M
+        reservations:
+          cpus: '0.15'
+          memory: 512M
+    restart: unless-stopped
   dashboard:
     &dashboard
     image: pawelmalak/flame:2.3.0
@@ -8,7 +19,7 @@ x-var:
       PASSWORD: "admin"
   uptime-kuma:
     &uptime-kuma
-    image: louislam/uptime-kuma:1.20.2
+    image: louislam/uptime-kuma:1.21.2
   grafana:
     &grafana
     image: grafana/grafana-oss:9.4.7
@@ -17,7 +28,7 @@ x-var:
     image: victoriametrics/victoria-metrics:v1.88.1
   mongo:
     &mongo
-    image: mongo:5.0.15
+    image: mongo:5.0.16
   elasticsearch:
     &elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
@@ -26,7 +37,7 @@ x-var:
     image: quay.io/prometheuscommunity/elasticsearch-exporter:v1.5.0
   graylog:
     &graylog
-    image: graylog/graylog:5.0.5
+    image: graylog/graylog:5.0.6
   black_box_exporter:
     &black_box_exporter
     image: prom/blackbox-exporter:v0.23.0
@@ -35,10 +46,10 @@ x-var:
     image: prom/snmp-exporter:v0.21.0
   traefik:
     &traefik
-    image: traefik:v2.9.9
+    image: traefik:v2.9.10
   gitlab_runner:
     &gitlab_runner
-    image: gitlab/gitlab-runner:v15.9.1
+    image: gitlab/gitlab-runner:v15.10.1
   samba:
     &samba
     image: glowcow/samba:4.13.13
@@ -48,9 +59,10 @@ x-var:
 
 services:
   dashboard:
-    <<: *dashboard
+    <<:
+      - *dashboard
+      - *resources
     container_name: pi_dashboard_dc
-    restart: unless-stopped
     volumes:
       - /docker_apps/flame:/app/data
     labels:
@@ -65,9 +77,10 @@ services:
       - "traefik.http.routers.dashboard-secure.tls.domains[0].main=pi.glowcow.xyz"
       - "traefik.http.routers.dashboard-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
   uptime-kuma:
-    <<: *uptime-kuma
+    <<:
+      - *uptime-kuma
+      - *resources
     container_name: kuma_dc
-    restart: unless-stopped
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - /docker_apps/kuma:/app/data
@@ -83,9 +96,10 @@ services:
       - "traefik.http.routers.kuma-secure.tls.domains[0].main=pi.glowcow.xyz"
       - "traefik.http.routers.kuma-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
   grafana:
-    <<: *grafana
+    <<:
+      - *grafana
+      - *resources
     container_name: grafana_dc
-    restart: unless-stopped
     environment:
       - GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=victoriametrics-datasource
     depends_on:
@@ -106,7 +120,9 @@ services:
       - "traefik.http.routers.grafana-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
   victoriametrics:
     container_name: victoriametrics_dc
-    <<: *victoriametrics
+    <<:
+      - *victoriametrics
+      - *resources
     volumes:
       - /docker_apps/victoriametrics/data:/storage
       - /docker_apps/victoriametrics/scrape.yaml:/etc/vm/scrape.yaml
@@ -115,7 +131,6 @@ services:
       - "--httpListenAddr=:8428"
       - "--retentionPeriod=6"
       - "--promscrape.config=/etc/vm/scrape.yaml"
-    restart: unless-stopped
     depends_on:
       - elasticsearch_exporter
       - black_box_exporter
@@ -132,15 +147,17 @@ services:
       - "traefik.http.routers.victoriametrics-secure.tls.domains[0].main=pi.glowcow.xyz"
       - "traefik.http.routers.victoriametrics-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
   mongo:
-    <<: *mongo
+    <<:
+      - *mongo
+      - *resources
     container_name: mongo_dc
-    restart: unless-stopped
     volumes:
       - /docker_apps/mongo:/data/db
   elasticsearch:
-    <<: *elasticsearch
+    <<:
+      - *elasticsearch
+      - *resources
     container_name: elasticsearch_dc
-    restart: unless-stopped
     environment:
       - http.host=0.0.0.0
       - transport.host=localhost
@@ -149,22 +166,24 @@ services:
     volumes:
       - /docker_apps/es:/usr/share/elasticsearch/data
   elasticsearch_exporter:
-      <<: *elasticsearch_exporter
-      container_name: elasticsearch_exporter_dc
-      command:
-       - '--es.uri=http://elasticsearch:9200'
-      restart: unless-stopped
+    <<:
+      - *elasticsearch_exporter
+      - *resources
+    container_name: elasticsearch_exporter_dc
+    command:
+     - '--es.uri=http://elasticsearch:9200'
   graylog:
-    <<: *graylog
+    <<:
+      - *graylog
+      - *resources
     container_name: graylog_dc
-    restart: unless-stopped
     entrypoint: /usr/bin/tini -- wait-for-it elasticsearch:9200 --  /docker-entrypoint.sh
     depends_on:
       - mongo
       - elasticsearch
     ports:
     # Graylog web interface and REST API
-      - 9000:9000
+    #  - 9000:9000
     # Syslog TCP
       - 1514:1514
     # Syslog UDP
@@ -189,9 +208,10 @@ services:
       - "traefik.http.routers.graylog-secure.tls.domains[0].main=pi.glowcow.xyz"
       - "traefik.http.routers.graylog-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
   black_box_exporter:
-    <<: *black_box_exporter
+    <<:
+      - *black_box_exporter
+      - *resources
     container_name: black_box_exporter_dc
-    restart: unless-stopped
     volumes:
       - /docker_apps/bbexporter:/config/
     labels:
@@ -206,9 +226,10 @@ services:
       - "traefik.http.routers.bbox-secure.tls.domains[0].main=pi.glowcow.xyz"
       - "traefik.http.routers.bbox-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
   snmp_exporter:
-    <<: *snmp_exporter
+    <<:
+      - *snmp_exporter
+      - *resources
     container_name: snmp_exporter_dc
-    restart: unless-stopped
     command:
       - "--config.file=/etc/snmp_exporter/snmp.yml"
     volumes:
@@ -225,9 +246,10 @@ services:
       - "traefik.http.routers.snmp-secure.tls.domains[0].main=pi.glowcow.xyz"
       - "traefik.http.routers.snmp-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
   traefik:
-    <<: *traefik
+    <<:
+      - *traefik
+      - *resources
     container_name: traefik_dc
-    restart: unless-stopped
     env_file:
       - .godaddy.env
     command:
@@ -282,16 +304,18 @@ services:
       - "traefik.http.routers.traefik-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
       - "traefik.http.routers.traefik-secure.service=api@internal"
   gitlab_runner:
-    <<: *gitlab_runner
+    <<:
+      - *gitlab_runner
+      - *resources
     container_name: gitlab_runner_dc
-    restart: unless-stopped
     volumes:
       - /docker_apps/gitlab_runner:/etc/gitlab-runner
       - /var/run/docker.sock:/var/run/docker.sock
   samba:
-    <<: *samba
+    <<:
+      - *samba
+      - *resources
     container_name: samba_dc
-    restart: unless-stopped
     ports:
       - 137:137
       - 138:138
@@ -302,9 +326,10 @@ services:
       - /docker_apps/samba/config/:/etc/samba/
       - /NAS/:/NAS/
   transmission:
-    <<: *transmission
+    <<:
+      - *transmission
+      - *resources
     container_name: transmission_dc
-    restart: unless-stopped
     volumes:
       - /docker_apps/transmission/:/etc/transmission-daemon/
       - /NAS/Downloads/:/Downloads/
