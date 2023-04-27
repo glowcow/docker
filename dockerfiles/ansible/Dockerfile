@@ -6,7 +6,7 @@ RUN pip3 wheel --no-cache-dir --no-deps --wheel-dir /builder/wheels -r requireme
 FROM python:3.9-slim-bullseye AS stage-2
 WORKDIR /ansible
 ARG TZ=Asia/Jerusalem
-ARG ANSIBLE_EXTRA_COLLECTIONS="community.general ansible.posix"
+ARG ANSIBLE_EXTRA_COLLECTIONS="community.general ansible.posix community.postgresql"
 ENV PYTHONUNBUFFERED=1
 ENV ANSIBLE_CONFIG=./ansible.cfg
 ENV ANSIBLE_FORCE_COLOR=true
