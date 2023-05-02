@@ -7,7 +7,7 @@ x-var:
       resources:
         limits:
           cpus: '2'
-          memory: 2048M
+          memory: 1536M
         reservations:
           cpus: '0.15'
           memory: 512M
@@ -22,13 +22,13 @@ x-var:
     image: louislam/uptime-kuma:1.21.2
   grafana:
     &grafana
-    image: grafana/grafana-oss:9.4.7
+    image: grafana/grafana-oss:9.4.9
   victoriametrics:
     &victoriametrics
-    image: victoriametrics/victoria-metrics:v1.88.1
+    image: victoriametrics/victoria-metrics:v1.87.5
   mongo:
     &mongo
-    image: mongo:5.0.16
+    image: mongo:5.0.17
   elasticsearch:
     &elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
@@ -49,7 +49,7 @@ x-var:
     image: gcr.io/cadvisor/cadvisor-amd64:v0.47.1
   traefik:
     &traefik
-    image: traefik:v2.9.10
+    image: traefik:v2.10.1
   gitlab_runner:
     &gitlab_runner
     image: gitlab/gitlab-runner:v15.10.1
@@ -186,17 +186,6 @@ services:
     depends_on:
       - mongo
       - elasticsearch
-    ports:
-    # Graylog web interface and REST API
-    #  - 9000:9000
-    # Syslog TCP
-      - 1514:1514
-    # Syslog UDP
-      - 1514:1514/udp
-    # GELF TCP
-      - 12201:12201
-    # GELF UDP
-      - 12201:12201/udp
     volumes:
       - /docker_apps/graylog/data:/usr/share/graylog/data
       - /docker_apps/graylog/config:/usr/share/graylog/data/config
@@ -212,6 +201,16 @@ services:
       - "traefik.http.routers.graylog-secure.tls.certresolver=wildcard-godaddy"
       - "traefik.http.routers.graylog-secure.tls.domains[0].main=pi.glowcow.xyz"
       - "traefik.http.routers.graylog-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
+      - "traefik.tcp.routers.graylog-tcp-1.entrypoints=graylog-tcp-1"
+      - "traefik.tcp.routers.graylog-tcp-1.rule=HostSNI(`*`)"
+      - "traefik.tcp.routers.graylog-tcp-1.service=graylog-tcp-1"
+      - "traefik.tcp.services.graylog-tcp-1.loadbalancer.server.port=1514"
+      - "traefik.udp.routers.graylog-udp-1.entrypoints=graylog-udp-1"
+      - "traefik.udp.routers.graylog-udp-1.service=graylog-udp-1"
+      - "traefik.udp.services.graylog-udp-1.loadbalancer.server.port=1514"
+      - "traefik.udp.routers.graylog-udp-2.entrypoints=graylog-udp-2"
+      - "traefik.udp.routers.graylog-udp-2.service=graylog-udp-2"
+      - "traefik.udp.services.graylog-udp-2.loadbalancer.server.port=12201"
   black_box_exporter:
     <<:
       - *black_box_exporter
@@ -277,7 +276,12 @@ services:
       - "--accesslog.filepath=/dev/stdout"
       - "--entrypoints.traefik.address=:8888"
       - "--entrypoints.web.address=:80"
-      - "--entryPoints.websecure.address=:443"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.graylog-tcp-1.address=:1514"
+      - "--entrypoints.graylog-udp-1.address=:1514/udp"
+      - "--entrypoints.graylog-udp-2.address=:12201/udp"
+      - "--entrypoints.smb-tcp-1.address=:445"
+      - "--entrypoints.smb-tcp-2.address=:139"
       - "--providers.file.filename=/etc/traefik/dynamic.yml"
       - "--serversTransport.insecureSkipVerify=true"
       - "--metrics.prometheus=true"
@@ -294,12 +298,19 @@ services:
       - 80:80
       - 443:443
       - 8888:8888
+      - 1514:1514
+      - 1514:1514/udp
+      - 12201:12201/udp
+      - 139:139
+      - 445:445
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "/docker_apps/traefik/certs:/tls-certificates"
       - "/docker_apps/traefik/dynamic.yml:/etc/traefik/dynamic.yml"
     depends_on:
       - dashboard
+      - graylog
+      - samba
       - grafana
       - victoriametrics
       - black_box_exporter
@@ -332,15 +343,20 @@ services:
       - *samba
       - *resources
     container_name: samba_dc
-    ports:
-      - 137:137
-      - 138:138
-      - 139:139
-      - 445:445
     volumes:
       - /docker_apps/samba/private/:/var/lib/samba/private/
       - /docker_apps/samba/config/:/etc/samba/
       - /NAS/:/NAS/
+    labels:
+      - "traefik.enable=true"
+      - "traefik.tcp.routers.smb-tcp-1.entrypoints=smb-tcp-1"
+      - "traefik.tcp.routers.smb-tcp-1.rule=HostSNI(`*`)"
+      - "traefik.tcp.routers.smb-tcp-1.service=smb-tcp-1"
+      - "traefik.tcp.services.smb-tcp-1.loadbalancer.server.port=445"
+      - "traefik.tcp.routers.smb-tcp-2.entrypoints=smb-tcp-2"
+      - "traefik.tcp.routers.smb-tcp-2.rule=HostSNI(`*`)"
+      - "traefik.tcp.routers.smb-tcp-2.service=smb-tcp-2"
+      - "traefik.tcp.services.smb-tcp-2.loadbalancer.server.port=139"
   transmission:
     <<:
       - *transmission
