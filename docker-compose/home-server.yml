@@ -19,13 +19,13 @@ x-var:
       PASSWORD: "admin"
   uptime-kuma:
     &uptime-kuma
-    image: louislam/uptime-kuma:1.21.2
+    image: louislam/uptime-kuma:1.21.3
   grafana:
     &grafana
-    image: grafana/grafana-oss:9.4.9
+    image: grafana/grafana-oss:9.5.2
   victoriametrics:
     &victoriametrics
-    image: victoriametrics/victoria-metrics:v1.87.5
+    image: victoriametrics/victoria-metrics:v1.87.6
   mongo:
     &mongo
     image: mongo:5.0.17
@@ -37,10 +37,10 @@ x-var:
     image: quay.io/prometheuscommunity/elasticsearch-exporter:v1.5.0
   graylog:
     &graylog
-    image: graylog/graylog:5.0.6
+    image: graylog/graylog:5.1.0
   black_box_exporter:
     &black_box_exporter
-    image: prom/blackbox-exporter:v0.23.0
+    image: prom/blackbox-exporter:v0.24.0
   snmp_exporter:
     &snmp_exporter
     image: prom/snmp-exporter:v0.21.0
