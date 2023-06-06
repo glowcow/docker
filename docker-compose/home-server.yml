@@ -22,13 +22,13 @@ x-var:
     image: louislam/uptime-kuma:1.21.3
   grafana:
     &grafana
-    image: grafana/grafana-oss:9.5.2
+    image: grafana/grafana-oss:9.5.3
   victoriametrics:
     &victoriametrics
     image: victoriametrics/victoria-metrics:v1.87.6
   mongo:
     &mongo
-    image: mongo:5.0.17
+    image: mongo:5.0.18
   elasticsearch:
     &elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
@@ -37,7 +37,10 @@ x-var:
     image: quay.io/prometheuscommunity/elasticsearch-exporter:v1.5.0
   graylog:
     &graylog
-    image: graylog/graylog:5.1.0
+    image: graylog/graylog:5.1.1
+  node_exporter:
+    &node_exporter
+    image: prom/node-exporter:v1.6.0
   black_box_exporter:
     &black_box_exporter
     image: prom/blackbox-exporter:v0.24.0
@@ -52,7 +55,7 @@ x-var:
     image: traefik:v2.10.1
   gitlab_runner:
     &gitlab_runner
-    image: gitlab/gitlab-runner:v15.10.1
+    image: gitlab/gitlab-runner:v16.0.1
   samba:
     &samba
     image: glowcow/samba:4.13.13
@@ -229,6 +232,27 @@ services:
       - "traefik.http.routers.bbox-secure.tls.certresolver=wildcard-godaddy"
       - "traefik.http.routers.bbox-secure.tls.domains[0].main=pi.glowcow.xyz"
       - "traefik.http.routers.bbox-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
+  node_exporter:
+    <<:
+      - *node_exporter
+      - *resources
+    container_name: node_exporter_dc
+    volumes:
+      - /:/hostfs:ro,rslave
+    command:
+      - '--path.rootfs=/hostfs'
+    privileged: true
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nex.entrypoints=web"
+      - "traefik.http.routers.nex.rule=Host(`nex01.pi.glowcow.xyz`)"
+      - "traefik.http.routers.nex.middlewares=https-redirect"
+      - "traefik.http.routers.nex-secure.entrypoints=websecure"
+      - "traefik.http.routers.nex-secure.rule=Host(`nex01.pi.glowcow.xyz`)"
+      - "traefik.http.routers.nex-secure.tls=true"
+      - "traefik.http.routers.nex-secure.tls.certresolver=wildcard-godaddy"
+      - "traefik.http.routers.nex-secure.tls.domains[0].main=pi.glowcow.xyz"
+      - "traefik.http.routers.nex-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
   snmp_exporter:
     <<:
       - *snmp_exporter
