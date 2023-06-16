@@ -3,7 +3,7 @@ stages:
 
 build custom image:
   stage: image
-  image: docker:20.10.21
+  image: docker:23.0.6
   rules:
     - if: $CI_COMMIT_REF_NAME =~ "master" && $BUILD && $TAG
       variables:

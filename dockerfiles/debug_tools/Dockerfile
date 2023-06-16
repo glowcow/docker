@@ -1,4 +1,4 @@
-FROM debian:bullseye-slim
+FROM debian:bookworm-slim
 ARG TZ=Asia/Jerusalem
 ARG EXTRA_PACKAGES="openssh-client mc jq curl wget whois telnet iproute2 dnsutils iputils-ping netcat net-tools nmap inetutils-traceroute nano vim"
 RUN apt-get update \
