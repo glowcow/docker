@@ -37,7 +37,7 @@ x-var:
     image: quay.io/prometheuscommunity/elasticsearch-exporter:v1.5.0
   graylog:
     &graylog
-    image: graylog/graylog:5.1.1
+    image: graylog/graylog:5.1.2
   node_exporter:
     &node_exporter
     image: prom/node-exporter:v1.6.0
@@ -55,13 +55,13 @@ x-var:
     image: traefik:v2.10.1
   gitlab_runner:
     &gitlab_runner
-    image: gitlab/gitlab-runner:v16.0.1
+    image: gitlab/gitlab-runner:v16.0.2
   samba:
     &samba
-    image: glowcow/samba:4.13.13
+    image: glowcow/samba:4.17.8
   transmission:
     &transmission
-    image: glowcow/transmission:3.00-1
+    image: glowcow/transmission:3.00
 
 services:
   dashboard:

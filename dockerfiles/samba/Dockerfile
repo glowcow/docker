@@ -11,4 +11,4 @@ RUN apt-get update \
     && dpkg-reconfigure -f noninteractive tzdata
 EXPOSE 137 138 139 445
 
-CMD ["/usr/sbin/smbd", "--foreground", "--no-process-group", "--log-stdout", "--configfile", "/etc/samba/smb.conf"]
+CMD ["/usr/sbin/smbd", "--foreground", "--no-process-group", "--configfile", "/etc/samba/smb.conf"]
