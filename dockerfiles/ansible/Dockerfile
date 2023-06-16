@@ -1,12 +1,12 @@
-FROM python:3.9-slim-bullseye AS stage-1
+FROM python:3.11-slim-bookworm AS stage-1
 WORKDIR /builder
 COPY requirements.txt .
 RUN pip3 wheel --no-cache-dir --no-deps --wheel-dir /builder/wheels -r requirements.txt
 
-FROM python:3.9-slim-bullseye AS stage-2
+FROM python:3.11-slim-bookworm AS stage-2
 WORKDIR /ansible
 ARG TZ=Asia/Jerusalem
-ARG ANSIBLE_EXTRA_COLLECTIONS="community.general ansible.posix community.postgresql"
+ARG ANSIBLE_EXTRA_COLLECTIONS="community.general ansible.posix community.postgresql community.docker"
 ENV PYTHONUNBUFFERED=1
 ENV ANSIBLE_CONFIG=./ansible.cfg
 ENV ANSIBLE_FORCE_COLOR=true
