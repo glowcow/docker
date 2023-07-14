@@ -1,6 +1,6 @@
 FROM debian:bookworm-slim
 ARG TZ=Asia/Jerusalem
-ARG EXTRA_PACKAGES="openssh-client mc jq curl wget whois telnet iproute2 dnsutils iputils-ping netcat-openbsd net-tools nmap inetutils-traceroute nano vim"
+ARG EXTRA_PACKAGES="openssh-client mc jq curl git wget whois telnet iproute2 dnsutils iputils-ping netcat-openbsd net-tools nmap inetutils-traceroute nano"
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y ${EXTRA_PACKAGES} \
     && rm -rf /var/lib/apt/lists/* \

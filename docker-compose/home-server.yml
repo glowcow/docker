@@ -19,10 +19,10 @@ x-var:
       PASSWORD: "admin"
   uptime-kuma:
     &uptime-kuma
-    image: louislam/uptime-kuma:1.21.3
+    image: louislam/uptime-kuma:1.22.1
   grafana:
     &grafana
-    image: grafana/grafana-oss:9.5.3
+    image: grafana/grafana-oss:9.5.6
   victoriametrics:
     &victoriametrics
     image: victoriametrics/victoria-metrics:v1.87.6
@@ -34,10 +34,10 @@ x-var:
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
   elasticsearch_exporter:
     &elasticsearch_exporter
-    image: quay.io/prometheuscommunity/elasticsearch-exporter:v1.5.0
+    image: quay.io/prometheuscommunity/elasticsearch-exporter:v1.6.0
   graylog:
     &graylog
-    image: graylog/graylog:5.1.2
+    image: graylog/graylog:5.1.3
   node_exporter:
     &node_exporter
     image: prom/node-exporter:v1.6.0
@@ -49,13 +49,13 @@ x-var:
     image: prom/snmp-exporter:v0.21.0
   cadvisor:
     &cadvisor
-    image: gcr.io/cadvisor/cadvisor-amd64:v0.47.1
+    image: gcr.io/cadvisor/cadvisor-amd64:v0.47.2
   traefik:
     &traefik
-    image: traefik:v2.10.1
+    image: traefik:v2.10.3
   gitlab_runner:
     &gitlab_runner
-    image: gitlab/gitlab-runner:v16.0.2
+    image: gitlab/gitlab-runner:v16.1.0
   samba:
     &samba
     image: glowcow/samba:4.17.8
