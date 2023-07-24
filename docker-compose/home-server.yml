@@ -14,7 +14,7 @@ x-var:
     restart: unless-stopped
   dashboard:
     &dashboard
-    image: pawelmalak/flame:2.3.0
+    image: pawelmalak/flame:2.3.1
     environment:
       PASSWORD: "admin"
   uptime-kuma:
@@ -28,7 +28,7 @@ x-var:
     image: victoriametrics/victoria-metrics:v1.87.6
   mongo:
     &mongo
-    image: mongo:5.0.18
+    image: mongo:5.0.19
   elasticsearch:
     &elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
@@ -55,7 +55,7 @@ x-var:
     image: traefik:v2.10.3
   gitlab_runner:
     &gitlab_runner
-    image: gitlab/gitlab-runner:v16.1.0
+    image: gitlab/gitlab-runner:v16.2.0
   samba:
     &samba
     image: glowcow/samba:4.17.8
