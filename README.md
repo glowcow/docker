@@ -8,9 +8,9 @@ To build a new image:
 Enter two mandatory variables:
 
 * **BUILD** - This is repo name on Docker Hub same as subdirectory under dockerfiles (e.g. *debug_tools*).
-* **TAG** - New tag for image (e.g. *0.13*).
+* **TAG** - New tag for image (e.g. *0.14*).
 
 ### Kubernetes example
 ```bash
-kubectl run debug-pod --rm -i -n <ns> --tty --image glowcow/debug_tools:0.13 -- /bin/bash
+kubectl run debug-pod --rm -i -n <ns> --tty --image glowcow/debug_tools:0.14 -- /bin/bash
 ```
