@@ -22,7 +22,7 @@ x-var:
     image: louislam/uptime-kuma:1.22.1
   grafana:
     &grafana
-    image: grafana/grafana-oss:9.5.6
+    image: grafana/grafana-oss:9.5.7
   victoriametrics:
     &victoriametrics
     image: victoriametrics/victoria-metrics:v1.87.6
@@ -40,25 +40,25 @@ x-var:
     image: graylog/graylog:5.1.3
   node_exporter:
     &node_exporter
-    image: prom/node-exporter:v1.6.0
+    image: prom/node-exporter:v1.6.1
   black_box_exporter:
     &black_box_exporter
     image: prom/blackbox-exporter:v0.24.0
   snmp_exporter:
     &snmp_exporter
-    image: prom/snmp-exporter:v0.21.0
+    image: prom/snmp-exporter:v0.22.0
   cadvisor:
     &cadvisor
     image: gcr.io/cadvisor/cadvisor-amd64:v0.47.2
   traefik:
     &traefik
-    image: traefik:v2.10.3
+    image: traefik:v2.10.4
   gitlab_runner:
     &gitlab_runner
     image: gitlab/gitlab-runner:v16.2.0
   samba:
     &samba
-    image: glowcow/samba:4.17.8
+    image: glowcow/samba:4.17.9
   transmission:
     &transmission
     image: glowcow/transmission:3.00
@@ -143,6 +143,8 @@ services:
       - elasticsearch_exporter
       - black_box_exporter
       - snmp_exporter
+      - node_exporter
+      - cadvisor
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.victoriametrics.entrypoints=web"
@@ -336,11 +338,12 @@ services:
       - graylog
       - samba
       - grafana
-      - victoriametrics
+      - node_exporter
       - black_box_exporter
       - snmp_exporter
       - uptime-kuma
       - transmission
+      - victoriametrics
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.entrypoints=web"
