@@ -293,11 +293,11 @@ services:
     env_file:
       - .godaddy.env
     command:
-      #- "--log.level=DEBUG"
+      - "--log.level=INFO"
       - "--api.insecure=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
-      - "--accesslog=false"
+      - "--accesslog=true"
       - "--accesslog.format=json"
       - "--accesslog.filepath=/dev/stdout"
       - "--entrypoints.traefik.address=:8888"
