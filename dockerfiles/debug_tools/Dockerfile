@@ -8,7 +8,7 @@ ENV CA_CERT_PATH="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y ${EXTRA_PACKAGES} \
     && rm -rf /var/lib/apt/lists/* \
-    && wget https://dl.min.io/client/mc/release/linux-amd64/mc \
+    && wget -q https://dl.min.io/client/mc/release/linux-amd64/mc \
     && chmod +x mc \
     && mv mc /usr/local/bin/minc \
     && curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" \
