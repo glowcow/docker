@@ -1,6 +1,6 @@
 FROM debian:bookworm-slim
 WORKDIR /root
-COPY README /root/README
+COPY README.md /root/README.md
 ARG TZ=Asia/Jerusalem
 ARG EXTRA_PACKAGES="postgresql-client openssh-client mc jq curl git wget whois telnet iproute2 dnsutils iputils-ping netcat-openbsd net-tools nmap inetutils-traceroute nano"
 ENV TOKEN_PATH="/var/run/secrets/kubernetes.io/serviceaccount/token"
