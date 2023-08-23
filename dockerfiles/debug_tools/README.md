@@ -2,7 +2,7 @@
 
 ### 1. Using Kubernetes Service Account to create Jobs(for example):
 
-```json
+```bash
 curl -H "Authorization: Bearer $(cat $TOKEN_PATH)" --cacert $CA_CERT_PATH -X POST -H "Content-Type: application/json" --data '{
   "apiVersion": "batch/v1",
   "kind": "Job",
