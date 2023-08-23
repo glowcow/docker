@@ -1,4 +1,6 @@
-APISERVER=https://<YOUR-KUBERNETES-API-SERVER>
+#/bin/bash
+
+APISERVER=https://kubernetes.default.svc
 TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
 NAMESPACE=default
 CLUSTER_NAME=my-cluster

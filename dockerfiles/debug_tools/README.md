@@ -1,5 +1,11 @@
 ## Examples
 
+### Generate kubeconfig from Kubernetes Service Account Token (for kubectl, helm, etc):
+
+```bash
+./make_kubeconfig.sh
+```
+
 ### 1. Using Kubernetes Service Account to create Jobs(for example):
 
 ```bash
