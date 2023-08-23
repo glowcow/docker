@@ -1,10 +1,12 @@
 FROM debian:bookworm-slim
 WORKDIR /root
-COPY README.md /root/README.md
+COPY . /root/
 ARG TZ=Asia/Jerusalem
 ARG EXTRA_PACKAGES="postgresql-client openssh-client mc jq curl git wget whois telnet iproute2 dnsutils iputils-ping netcat-openbsd net-tools nmap inetutils-traceroute nano"
 ENV TOKEN_PATH="/var/run/secrets/kubernetes.io/serviceaccount/token"
 ENV CA_CERT_PATH="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+ENV KUBECONFIG="/tmp/kubeconfig"
+ENV KUBE_EDITOR="nano"
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y ${EXTRA_PACKAGES} \
     && rm -rf /var/lib/apt/lists/* \
@@ -17,6 +19,7 @@ RUN apt-get update \
     && curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 \
     && chmod 700 get_helm.sh \
     && ./get_helm.sh \
+    && rm get_helm.sh \
     && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime \
     && echo ${TZ} > /etc/timezone \
     && dpkg-reconfigure -f noninteractive tzdata
