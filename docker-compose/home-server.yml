@@ -140,8 +140,8 @@ services:
       - "--httpListenAddr=:8428"
       - "--retentionPeriod=6"
       - "--promscrape.config=/etc/vm/scrape.yaml"
-      - "--promscrape.maxScrapeSize=33554432"
-      - "--maxLabelsPerTimeseries=60"
+      - "--promscrape.maxScrapeSize=50MB"
+      - "--maxLabelsPerTimeseries=80"
     depends_on:
       - elasticsearch_exporter
       - black_box_exporter
