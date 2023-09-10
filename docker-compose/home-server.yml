@@ -12,6 +12,8 @@ x-var:
           cpus: '0.15'
           memory: 256M
     restart: unless-stopped
+    networks:
+      - pi_services
   dashboard:
     &dashboard
     image: pawelmalak/flame:2.3.1
@@ -448,6 +450,10 @@ services:
       - "traefik.http.routers.tm-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
 
 networks:
-  default:
-    name: pi_services_net
+  pi_services:
+    name: pi_services
     driver: bridge
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: 2001:0DB8::/122
