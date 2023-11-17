@@ -30,7 +30,7 @@ x-var:
     image: victoriametrics/victoria-metrics:v1.93.7
   mongo:
     &mongo
-    image: mongo:5.0.21
+    image: mongo:5.0.22
   elasticsearch:
     &elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
@@ -67,6 +67,9 @@ x-var:
   transmission:
     &transmission
     image: glowcow/transmission:3.00
+  ipv6-monitor:
+    &ipv6-monitor
+    image: glowcow/ipv6-monitor:0.2
 
 services:
   dashboard:
@@ -448,6 +451,22 @@ services:
       - "traefik.http.routers.tm-secure.tls.certresolver=wildcard-godaddy"
       - "traefik.http.routers.tm-secure.tls.domains[0].main=pi.glowcow.xyz"
       - "traefik.http.routers.tm-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
+  ipv6_monitor:
+    <<:
+      - *ipv6-monitor
+    container_name: ipv6_monitor_dc
+    network_mode: host
+    volumes:
+      - /docker_apps/ipv6-monitor/config.yaml:/app/config.yaml
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 512M
+        reservations:
+          cpus: '0.15'
+          memory: 256M
+    restart: unless-stopped
 
 networks:
   pi_services:
