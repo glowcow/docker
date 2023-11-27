@@ -69,7 +69,7 @@ x-var:
     image: glowcow/transmission:3.00
   ipv6-monitor:
     &ipv6-monitor
-    image: glowcow/ipv6-monitor:0.2
+    image: glowcow/ipv6_monitor:0.2
 
 services:
   dashboard:

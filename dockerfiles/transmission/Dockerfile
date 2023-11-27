@@ -1,4 +1,4 @@
-FROM debian:bookworm
+FROM debian:bookworm-slim
 ARG TAG
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y transmission-daemon=${TAG}-2.1+deb12u1 \

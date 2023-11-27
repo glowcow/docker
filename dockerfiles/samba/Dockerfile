@@ -1,4 +1,4 @@
-FROM debian:bookworm
+FROM debian:bookworm-slim
 ARG TAG
 ARG SMB_USER="pi_smb"
 RUN apt-get update \

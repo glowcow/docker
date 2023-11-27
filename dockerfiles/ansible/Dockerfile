@@ -5,7 +5,6 @@ RUN pip3 wheel --no-cache-dir --no-deps --wheel-dir /builder/wheels -r requireme
 
 FROM python:3.10-slim-bookworm AS stage-2
 WORKDIR /ansible
-ARG TZ=Asia/Jerusalem
 ARG ANSIBLE_EXTRA_COLLECTIONS="community.general ansible.posix community.postgresql community.docker"
 ENV PYTHONUNBUFFERED=1
 ENV ANSIBLE_CONFIG=./ansible.cfg
@@ -17,9 +16,6 @@ COPY --from=stage-1 /builder/wheels /wheels
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y sshpass \
     && rm -rf /var/lib/apt/lists/* \
-    && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime \
-    && echo ${TZ} > /etc/timezone \
-    && dpkg-reconfigure -f noninteractive tzdata \
     && mkdir -m 600 ~/.ssh \
     && pip3 install --no-cache /wheels/* \
     && ansible-galaxy collection install ${ANSIBLE_EXTRA_COLLECTIONS}
