@@ -21,13 +21,13 @@ x-var:
       PASSWORD: "admin"
   uptime-kuma:
     &uptime-kuma
-    image: louislam/uptime-kuma:1.23.4
+    image: louislam/uptime-kuma:1.23.7
   grafana:
     &grafana
     image: grafana/grafana-oss:10.1.5
   victoriametrics:
     &victoriametrics
-    image: victoriametrics/victoria-metrics:v1.93.7
+    image: victoriametrics/victoria-metrics:v1.93.8
   mongo:
     &mongo
     image: mongo:5.0.22
@@ -79,6 +79,8 @@ services:
     container_name: pi_dashboard_dc
     volumes:
       - /docker_apps/flame:/app/data
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.dashboard.entrypoints=web"
@@ -98,6 +100,8 @@ services:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - /docker_apps/kuma:/app/data
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.kuma.entrypoints=web"
@@ -121,6 +125,8 @@ services:
       - elasticsearch
     volumes:
       - /docker_apps/grafana:/var/lib/grafana
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.grafana.entrypoints=web"
@@ -140,6 +146,8 @@ services:
     volumes:
       - /docker_apps/victoriametrics/data:/storage
       - /docker_apps/victoriametrics/scrape.yaml:/etc/vm/scrape.yaml
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     command:
       - "--storageDataPath=/storage"
       - "--httpListenAddr=:8428"
@@ -171,6 +179,8 @@ services:
     container_name: mongo_dc
     volumes:
       - /docker_apps/mongo:/data/db
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
   elasticsearch:
     <<:
       - *elasticsearch
@@ -183,6 +193,8 @@ services:
       - "ES_JAVA_OPTS=-Dlog4j2.formatMsgNoLookups=true -Xms512m -Xmx512m"
     volumes:
       - /docker_apps/es:/usr/share/elasticsearch/data
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
   elasticsearch_exporter:
     <<:
       - *elasticsearch_exporter
@@ -190,6 +202,9 @@ services:
     container_name: elasticsearch_exporter_dc
     command:
      - '--es.uri=http://elasticsearch:9200'
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
   graylog:
     <<:
       - *graylog
@@ -202,6 +217,8 @@ services:
     volumes:
       - /docker_apps/graylog/data:/usr/share/graylog/data
       - /docker_apps/graylog/config:/usr/share/graylog/data/config
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     labels:
       - "traefik.enable=true"
       - "traefik.http.services.graylog.loadbalancer.server.port=9000"
@@ -231,6 +248,8 @@ services:
     container_name: black_box_exporter_dc
     volumes:
       - /docker_apps/bbexporter:/config/
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.bbox.entrypoints=web"
@@ -249,6 +268,8 @@ services:
     container_name: node_exporter_dc
     volumes:
       - /:/hostfs:ro,rslave
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     command:
       - '--path.rootfs=/hostfs'
     privileged: true
@@ -272,6 +293,8 @@ services:
       - "--config.file=/etc/snmp_exporter/snmp.yml"
     volumes:
       - /docker_apps/snmp_exporter/snmp.yml:/etc/snmp_exporter/snmp.yml
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.snmp.entrypoints=web"
@@ -293,6 +316,8 @@ services:
       - /var/run:/var/run:ro
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
   minio:
     <<:
       - *minio
@@ -300,6 +325,8 @@ services:
     container_name: minio_dc
     volumes:
       - /docker_apps/minio:/data
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     environment:
       MINIO_ROOT_USER: minio
       MINIO_ROOT_PASSWORD: minio123
@@ -378,6 +405,8 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "/docker_apps/traefik/certs:/tls-certificates"
       - "/docker_apps/traefik/dynamic.yml:/etc/traefik/dynamic.yml"
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     depends_on:
       - dashboard
       - graylog
@@ -413,6 +442,8 @@ services:
     volumes:
       - /docker_apps/gitlab_runner:/etc/gitlab-runner
       - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
   samba:
     <<:
       - *samba
@@ -422,6 +453,8 @@ services:
       - /docker_apps/samba/private/:/var/lib/samba/private/
       - /docker_apps/samba/config/:/etc/samba/
       - /NAS/:/NAS/
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     labels:
       - "traefik.enable=true"
       - "traefik.tcp.routers.smb-tcp-1.entrypoints=smb-tcp-1"
@@ -440,6 +473,8 @@ services:
     volumes:
       - /docker_apps/transmission/:/etc/transmission-daemon/
       - /NAS/Downloads/:/Downloads/
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.tm.entrypoints=web"
@@ -458,6 +493,8 @@ services:
     network_mode: host
     volumes:
       - /docker_apps/ipv6-monitor/config.yaml:/app/config.yaml
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     deploy:
       resources:
         limits:
