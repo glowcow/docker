@@ -21,13 +21,13 @@ x-var:
       PASSWORD: "admin"
   uptime-kuma:
     &uptime-kuma
-    image: louislam/uptime-kuma:1.23.7
+    image: louislam/uptime-kuma:1.23.10
   grafana:
     &grafana
     image: grafana/grafana-oss:10.1.5
   victoriametrics:
     &victoriametrics
-    image: victoriametrics/victoria-metrics:v1.93.8
+    image: victoriametrics/victoria-metrics:v1.93.9
   mongo:
     &mongo
     image: mongo:5.0.22
@@ -39,7 +39,7 @@ x-var:
     image: quay.io/prometheuscommunity/elasticsearch-exporter:v1.6.0
   graylog:
     &graylog
-    image: graylog/graylog:5.2.1
+    image: graylog/graylog:5.2.2
   node_exporter:
     &node_exporter
     image: prom/node-exporter:v1.6.1
@@ -57,10 +57,10 @@ x-var:
     image: minio/minio:RELEASE.2023-08-16T20-17-30Z
   traefik:
     &traefik
-    image: traefik:v2.10.5
+    image: traefik:v2.10.7
   gitlab_runner:
     &gitlab_runner
-    image: gitlab/gitlab-runner:v16.5.0
+    image: gitlab/gitlab-runner:v16.6.1
   samba:
     &samba
     image: glowcow/samba:4.17.12
