@@ -63,18 +63,22 @@ def monitor_global_ipv6_address(interval, interface, bot_token, chat_id, api_key
 #            print(f'{current_time} | {current_ipv6}')
         time.sleep(interval)
 
-# Load configuration variables
-config = load_config('config.yaml')
+def main():
+    # Load configuration variables
+    config = load_config('config.yaml')
 
-# Use the loaded configuration
-interf = config['interface']
-interv = config['interval']
-bot_token = config['telegram']['bot_token']
-chat_id = config['telegram']['chat_id']
-api_key = config['godaddy']['api_key']
-api_secret = config['godaddy']['api_secret']
-domain = config['godaddy']['domain']
-record_names = config['godaddy']['record_names']
+    # Use the loaded configuration
+    interf = config['interface']
+    interv = config['interval']
+    bot_token = config['telegram']['bot_token']
+    chat_id = config['telegram']['chat_id']
+    api_key = config['godaddy']['api_key']
+    api_secret = config['godaddy']['api_secret']
+    domain = config['godaddy']['domain']
+    record_names = config['godaddy']['record_names']
 
-# Run the monitor function
-monitor_global_ipv6_address(interv, interf, bot_token, chat_id, api_key, api_secret, domain, record_names)
+    # Run the monitor function
+    monitor_global_ipv6_address(interv, interf, bot_token, chat_id, api_key, api_secret, domain, record_names)
+
+if __name__ == "__main__":
+    main()
