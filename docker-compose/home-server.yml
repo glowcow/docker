@@ -21,16 +21,16 @@ x-var:
       PASSWORD: "admin"
   uptime-kuma:
     &uptime-kuma
-    image: louislam/uptime-kuma:1.23.10
+    image: louislam/uptime-kuma:1.23.11
   grafana:
     &grafana
-    image: grafana/grafana-oss:10.1.5
+    image: grafana/grafana-oss:10.1.6
   victoriametrics:
     &victoriametrics
     image: victoriametrics/victoria-metrics:v1.93.9
   mongo:
     &mongo
-    image: mongo:5.0.22
+    image: mongo:5.0.23
   elasticsearch:
     &elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
@@ -39,10 +39,7 @@ x-var:
     image: quay.io/prometheuscommunity/elasticsearch-exporter:v1.6.0
   graylog:
     &graylog
-    image: graylog/graylog:5.2.2
-  node_exporter:
-    &node_exporter
-    image: prom/node-exporter:v1.6.1
+    image: graylog/graylog:5.2.3
   black_box_exporter:
     &black_box_exporter
     image: prom/blackbox-exporter:v0.24.0
@@ -60,7 +57,7 @@ x-var:
     image: traefik:v2.10.7
   gitlab_runner:
     &gitlab_runner
-    image: gitlab/gitlab-runner:v16.6.1
+    image: gitlab/gitlab-runner:v16.6.2
   samba:
     &samba
     image: glowcow/samba:4.17.12
@@ -159,7 +156,6 @@ services:
       - elasticsearch_exporter
       - black_box_exporter
       - snmp_exporter
-      - node_exporter
       - cadvisor
     labels:
       - "traefik.enable=true"
@@ -261,29 +257,6 @@ services:
       - "traefik.http.routers.bbox-secure.tls.certresolver=wildcard-godaddy"
       - "traefik.http.routers.bbox-secure.tls.domains[0].main=pi.glowcow.xyz"
       - "traefik.http.routers.bbox-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
-  node_exporter:
-    <<:
-      - *node_exporter
-      - *resources
-    container_name: node_exporter_dc
-    volumes:
-      - /:/hostfs:ro,rslave
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
-    command:
-      - '--path.rootfs=/hostfs'
-    privileged: true
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.nex.entrypoints=web"
-      - "traefik.http.routers.nex.rule=Host(`nex01.pi.glowcow.xyz`)"
-      - "traefik.http.routers.nex.middlewares=https-redirect"
-      - "traefik.http.routers.nex-secure.entrypoints=websecure"
-      - "traefik.http.routers.nex-secure.rule=Host(`nex01.pi.glowcow.xyz`)"
-      - "traefik.http.routers.nex-secure.tls=true"
-      - "traefik.http.routers.nex-secure.tls.certresolver=wildcard-godaddy"
-      - "traefik.http.routers.nex-secure.tls.domains[0].main=pi.glowcow.xyz"
-      - "traefik.http.routers.nex-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
   snmp_exporter:
     <<:
       - *snmp_exporter
@@ -412,7 +385,6 @@ services:
       - graylog
       - samba
       - grafana
-      - node_exporter
       - black_box_exporter
       - snmp_exporter
       - uptime-kuma
@@ -452,7 +424,7 @@ services:
     volumes:
       - /docker_apps/samba/private/:/var/lib/samba/private/
       - /docker_apps/samba/config/:/etc/samba/
-      - /NAS/:/NAS/
+      - /nas/:/nas/
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     labels:
@@ -472,7 +444,7 @@ services:
     container_name: transmission_dc
     volumes:
       - /docker_apps/transmission/:/etc/transmission-daemon/
-      - /NAS/Downloads/:/Downloads/
+      - /nas/Downloads/:/Downloads/
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     labels:
