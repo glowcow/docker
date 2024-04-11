@@ -24,7 +24,7 @@ x-var:
     image: louislam/uptime-kuma:1.23.11
   grafana:
     &grafana
-    image: grafana/grafana-oss:10.3.5
+    image: grafana/grafana-oss:10.4.2
   victoriametrics:
     &victoriametrics
     image: victoriametrics/victoria-metrics:v1.97.1
@@ -39,7 +39,7 @@ x-var:
     image: quay.io/prometheuscommunity/elasticsearch-exporter:v1.6.0
   graylog:
     &graylog
-    image: graylog/graylog:5.2.5
+    image: graylog/graylog:5.2.6
   black_box_exporter:
     &black_box_exporter
     image: prom/blackbox-exporter:v0.24.0
@@ -51,7 +51,7 @@ x-var:
     image: gcr.io/cadvisor/cadvisor-amd64:v0.49.1
   minio:
     &minio
-    image: minio/minio:RELEASE.2024-02-09T21-25-16Z
+    image: minio/minio:RELEASE.2024-04-06T05-26-02Z
   traefik:
     &traefik
     image: traefik:v2.11.0
