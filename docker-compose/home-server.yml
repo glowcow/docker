@@ -21,7 +21,7 @@ x-var:
       PASSWORD: "admin"
   uptime-kuma:
     &uptime-kuma
-    image: louislam/uptime-kuma:1.23.11
+    image: louislam/uptime-kuma:1.23.13
   grafana:
     &grafana
     image: grafana/grafana-oss:10.4.2
@@ -39,7 +39,7 @@ x-var:
     image: quay.io/prometheuscommunity/elasticsearch-exporter:v1.6.0
   graylog:
     &graylog
-    image: graylog/graylog:5.2.6
+    image: graylog/graylog:5.2.7
   black_box_exporter:
     &black_box_exporter
     image: prom/blackbox-exporter:v0.24.0
@@ -54,7 +54,7 @@ x-var:
     image: minio/minio:RELEASE.2024-04-06T05-26-02Z
   traefik:
     &traefik
-    image: traefik:v2.11.0
+    image: traefik:v2.11.2
   gitlab_runner:
     &gitlab_runner
     image: gitlab/gitlab-runner:v16.9.1
@@ -64,9 +64,6 @@ x-var:
   transmission:
     &transmission
     image: glowcow/transmission:3.00
-  ipv6-monitor:
-    &ipv6-monitor
-    image: glowcow/ipv6_monitor:0.2.2
 
 services:
   dashboard:
@@ -86,7 +83,7 @@ services:
       - "traefik.http.routers.dashboard-secure.entrypoints=websecure"
       - "traefik.http.routers.dashboard-secure.rule=Host(`pi.glowcow.xyz`)"
       - "traefik.http.routers.dashboard-secure.tls=true"
-      - "traefik.http.routers.dashboard-secure.tls.certresolver=wildcard-godaddy"
+      - "traefik.http.routers.dashboard-secure.tls.certresolver=wildcard-namecheap"
       - "traefik.http.routers.dashboard-secure.tls.domains[0].main=pi.glowcow.xyz"
       - "traefik.http.routers.dashboard-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
   uptime-kuma:
@@ -107,7 +104,7 @@ services:
       - "traefik.http.routers.kuma-secure.entrypoints=websecure"
       - "traefik.http.routers.kuma-secure.rule=Host(`kuma.pi.glowcow.xyz`)"
       - "traefik.http.routers.kuma-secure.tls=true"
-      - "traefik.http.routers.kuma-secure.tls.certresolver=wildcard-godaddy"
+      - "traefik.http.routers.kuma-secure.tls.certresolver=wildcard-namecheap"
       - "traefik.http.routers.kuma-secure.tls.domains[0].main=pi.glowcow.xyz"
       - "traefik.http.routers.kuma-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
   grafana:
@@ -132,7 +129,7 @@ services:
       - "traefik.http.routers.grafana-secure.entrypoints=websecure"
       - "traefik.http.routers.grafana-secure.rule=Host(`grafana.pi.glowcow.xyz`)"
       - "traefik.http.routers.grafana-secure.tls=true"
-      - "traefik.http.routers.grafana-secure.tls.certresolver=wildcard-godaddy"
+      - "traefik.http.routers.grafana-secure.tls.certresolver=wildcard-namecheap"
       - "traefik.http.routers.grafana-secure.tls.domains[0].main=pi.glowcow.xyz"
       - "traefik.http.routers.grafana-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
   victoriametrics:
@@ -165,7 +162,7 @@ services:
       - "traefik.http.routers.victoriametrics-secure.entrypoints=websecure"
       - "traefik.http.routers.victoriametrics-secure.rule=Host(`vm.pi.glowcow.xyz`)"
       - "traefik.http.routers.victoriametrics-secure.tls=true"
-      - "traefik.http.routers.victoriametrics-secure.tls.certresolver=wildcard-godaddy"
+      - "traefik.http.routers.victoriametrics-secure.tls.certresolver=wildcard-namecheap"
       - "traefik.http.routers.victoriametrics-secure.tls.domains[0].main=pi.glowcow.xyz"
       - "traefik.http.routers.victoriametrics-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
   mongo:
@@ -224,7 +221,7 @@ services:
       - "traefik.http.routers.graylog-secure.entrypoints=websecure"
       - "traefik.http.routers.graylog-secure.rule=Host(`graylog.pi.glowcow.xyz`)"
       - "traefik.http.routers.graylog-secure.tls=true"
-      - "traefik.http.routers.graylog-secure.tls.certresolver=wildcard-godaddy"
+      - "traefik.http.routers.graylog-secure.tls.certresolver=wildcard-namecheap"
       - "traefik.http.routers.graylog-secure.tls.domains[0].main=pi.glowcow.xyz"
       - "traefik.http.routers.graylog-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
       - "traefik.tcp.routers.graylog-tcp-1.entrypoints=graylog-tcp-1"
@@ -254,7 +251,7 @@ services:
       - "traefik.http.routers.bbox-secure.entrypoints=websecure"
       - "traefik.http.routers.bbox-secure.rule=Host(`bbexporter.pi.glowcow.xyz`)"
       - "traefik.http.routers.bbox-secure.tls=true"
-      - "traefik.http.routers.bbox-secure.tls.certresolver=wildcard-godaddy"
+      - "traefik.http.routers.bbox-secure.tls.certresolver=wildcard-namecheap"
       - "traefik.http.routers.bbox-secure.tls.domains[0].main=pi.glowcow.xyz"
       - "traefik.http.routers.bbox-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
   snmp_exporter:
@@ -276,7 +273,7 @@ services:
       - "traefik.http.routers.snmp-secure.entrypoints=websecure"
       - "traefik.http.routers.snmp-secure.rule=Host(`snmp.pi.glowcow.xyz`)"
       - "traefik.http.routers.snmp-secure.tls=true"
-      - "traefik.http.routers.snmp-secure.tls.certresolver=wildcard-godaddy"
+      - "traefik.http.routers.snmp-secure.tls.certresolver=wildcard-namecheap"
       - "traefik.http.routers.snmp-secure.tls.domains[0].main=pi.glowcow.xyz"
       - "traefik.http.routers.snmp-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
   cadvisor:
@@ -315,7 +312,7 @@ services:
       - "traefik.http.routers.minio-secure.entrypoints=websecure"
       - "traefik.http.routers.minio-secure.rule=Host(`minio.pi.glowcow.xyz`)"
       - "traefik.http.routers.minio-secure.tls=true"
-      - "traefik.http.routers.minio-secure.tls.certresolver=wildcard-godaddy"
+      - "traefik.http.routers.minio-secure.tls.certresolver=wildcard-namecheap"
       - "traefik.http.routers.minio-secure.tls.domains[0].main=pi.glowcow.xyz"
       - "traefik.http.routers.minio-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
       - "traefik.http.services.s3.loadbalancer.server.port=9000"
@@ -327,7 +324,7 @@ services:
       - "traefik.http.routers.s3-secure.entrypoints=websecure"
       - "traefik.http.routers.s3-secure.rule=Host(`s3.pi.glowcow.xyz`)"
       - "traefik.http.routers.s3-secure.tls=true"
-      - "traefik.http.routers.s3-secure.tls.certresolver=wildcard-godaddy"
+      - "traefik.http.routers.s3-secure.tls.certresolver=wildcard-namecheap"
       - "traefik.http.routers.s3-secure.tls.domains[0].main=pi.glowcow.xyz"
       - "traefik.http.routers.s3-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
   traefik:
@@ -336,7 +333,7 @@ services:
       - *resources
     container_name: traefik_dc
     env_file:
-      - .godaddy.env
+      - .namecheap.env
     command:
       - "--log.level=INFO"
       - "--api.insecure=true"
@@ -358,13 +355,13 @@ services:
       - "--metrics.prometheus=true"
       # ACME V2 supports wildcard certificates.
       # Wildcard certificates can only be generated through a DNS-01 challenge.
-      - "--certificatesresolvers.wildcard-godaddy.acme.tlschallenge=false"
-      - "--certificatesResolvers.wildcard-godaddy.acme.dnsChallenge.provider=godaddy"
-      - "--certificatesResolvers.wildcard-godaddy.acme.dnsChallenge.delayBeforeCheck=0"
+      - "--certificatesresolvers.wildcard-namecheap.acme.tlschallenge=false"
+      - "--certificatesResolvers.wildcard-namecheap.acme.dnsChallenge.provider=namecheap"
+      - "--certificatesResolvers.wildcard-namecheap.acme.dnsChallenge.delayBeforeCheck=0"
       # Email address used for registration.
-      - "--certificatesresolvers.wildcard-godaddy.acme.email=glowcow@gmail.com"
+      - "--certificatesresolvers.wildcard-namecheap.acme.email=glowcow@gmail.com"
       # Certificates storage
-      - "--certificatesresolvers.wildcard-godaddy.acme.storage=/tls-certificates/acme.json"
+      - "--certificatesresolvers.wildcard-namecheap.acme.storage=/tls-certificates/acme_namecheap.json"
     ports:
       - 80:80
       - 443:443
@@ -400,7 +397,7 @@ services:
       - "traefik.http.routers.traefik-secure.entrypoints=websecure"
       - "traefik.http.routers.traefik-secure.rule=Host(`tf.pi.glowcow.xyz`)"
       - "traefik.http.routers.traefik-secure.tls=true"
-      - "traefik.http.routers.traefik-secure.tls.certresolver=wildcard-godaddy"
+      - "traefik.http.routers.traefik-secure.tls.certresolver=wildcard-namecheap"
       - "traefik.http.routers.traefik-secure.tls.domains[0].main=pi.glowcow.xyz"
       - "traefik.http.routers.traefik-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
       - "traefik.http.routers.traefik-secure.service=api@internal"
@@ -455,27 +452,9 @@ services:
       - "traefik.http.routers.tm-secure.entrypoints=websecure"
       - "traefik.http.routers.tm-secure.rule=Host(`tm.pi.glowcow.xyz`)"
       - "traefik.http.routers.tm-secure.tls=true"
-      - "traefik.http.routers.tm-secure.tls.certresolver=wildcard-godaddy"
+      - "traefik.http.routers.tm-secure.tls.certresolver=wildcard-namecheap"
       - "traefik.http.routers.tm-secure.tls.domains[0].main=pi.glowcow.xyz"
       - "traefik.http.routers.tm-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
-  ipv6_monitor:
-    <<:
-      - *ipv6-monitor
-    container_name: ipv6_monitor_dc
-    network_mode: host
-    volumes:
-      - /docker_apps/ipv6-monitor/config.yaml:/app/config.yaml
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
-    deploy:
-      resources:
-        limits:
-          cpus: '0.2'
-          memory: 512M
-        reservations:
-          cpus: '0.15'
-          memory: 256M
-    restart: unless-stopped
 
 networks:
   pi_services:
