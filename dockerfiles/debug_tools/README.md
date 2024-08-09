@@ -1,3 +1,26 @@
+## Installed tools
+ - postgresql-client
+ - sqlite3
+ - ncdu
+ - ntpdate
+ - openssh-client
+ - mc
+ - jq
+ - curl
+ - git
+ - wget
+ - whois
+ - telnet
+ - iproute2
+ - dnsutils
+ - iputils-ping
+ - tcpdump
+ - netcat-openbsd
+ - net-tools
+ - nmap
+ - inetutils-traceroute
+ - nano
+
 ## Examples
 
 ### Generate kubeconfig from Kubernetes Service Account Token (for kubectl, helm, etc):
