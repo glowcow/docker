@@ -2,7 +2,7 @@ FROM debian:bookworm-slim
 WORKDIR /root
 COPY . /root/
 ARG PKCTL=0.5.7
-ARG EXTRA_PACKAGES="postgresql-client sqlite3 ncdu ntpdate openssh-client mc jq curl git wget whois telnet iproute2 dnsutils iputils-ping tcpdump netcat-openbsd net-tools nmap inetutils-traceroute nano"
+ARG EXTRA_PACKAGES="postgresql-client sqlite3 ncdu htop ntpdate openssh-client mc jq curl git wget whois telnet iproute2 dnsutils iputils-ping tcpdump netcat-openbsd net-tools nmap inetutils-traceroute nano"
 ENV TOKEN_PATH="/var/run/secrets/kubernetes.io/serviceaccount/token"
 ENV CA_CERT_PATH="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
 ENV KUBECONFIG="/tmp/kubeconfig"

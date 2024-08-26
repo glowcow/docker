@@ -23,6 +23,9 @@ x-var:
   grafana:
     &grafana
     image: grafana/grafana-oss:11.1.4
+  grafana_renderer:
+    &grafana_renderer
+    image: grafana/grafana-image-renderer:3.11.3
   victoriametrics:
     &victoriametrics
     image: victoriametrics/victoria-metrics:v1.97.1
@@ -113,9 +116,12 @@ services:
     environment:
       - GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=victoriametrics-datasource
       - GF_SERVER_ROOT_URL=https://grafana.pi.glowcow.xyz/
+      - GF_RENDERING_SERVER_URL=http://grafana_renderer:8081/render
+      - GF_RENDERING_CALLBACK_URL=http://grafana:3000/
     depends_on:
       - victoriametrics
       - elasticsearch
+      - grafana_renderer
     volumes:
       - /docker_apps/grafana:/var/lib/grafana
       - /etc/localtime:/etc/localtime:ro
@@ -131,6 +137,14 @@ services:
       - "traefik.http.routers.grafana-secure.tls.certresolver=wildcard-namecheap"
       - "traefik.http.routers.grafana-secure.tls.domains[0].main=pi.glowcow.xyz"
       - "traefik.http.routers.grafana-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
+  grafana_renderer:
+    <<:
+      - *grafana_renderer
+      - *resources
+    container_name: grafana_renderer_dc
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
   victoriametrics:
     container_name: victoriametrics_dc
     <<:
@@ -170,7 +184,8 @@ services:
       - *resources
     container_name: mongo_dc
     volumes:
-      - /docker_apps/mongo:/data/db
+      - /docker_apps/mongo/db:/data/db
+      - /docker_apps/mongo/configdb:/data/configdb
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
   elasticsearch:
@@ -408,7 +423,8 @@ services:
     depends_on:
       - minio
     volumes:
-      - /docker_apps/gitlab_runner:/etc/gitlab-runner
+      - /docker_apps/gitlab_runner/etc:/etc/gitlab-runner
+      - /docker_apps/gitlab_runner/home:/home/gitlab-runner
       - /var/run/docker.sock:/var/run/docker.sock
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
