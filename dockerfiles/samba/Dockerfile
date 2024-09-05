@@ -6,5 +6,5 @@ RUN apt-get update \
     && useradd --system --no-create-home --shell /usr/sbin/nologin ${SMB_USER} \
     && rm -rf /var/lib/apt/lists/*
 EXPOSE 137 138 139 445
-
-CMD ["/usr/sbin/smbd", "--foreground", "--no-process-group", "--configfile", "/etc/samba/smb.conf"]
+ENTRYPOINT ["/usr/sbin/smbd"]
+CMD ["--foreground", "--no-process-group", "--configfile", "/etc/samba/smb.conf"]
