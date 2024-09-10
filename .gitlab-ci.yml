@@ -13,7 +13,7 @@ build custom image:
   stage: image
   image: docker:26.1.4
   rules:
-    - if: $CI_COMMIT_REF_NAME =~ "master" && $BUILD && $TAG
+    - if: $BUILD && $TAG
       variables:
         DOCKERFILE: dockerfiles/$BUILD/Dockerfile
         IMAGE: $DOCKERHUB_USERNAME/$BUILD:$TAG
