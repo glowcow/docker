@@ -1,9 +1,17 @@
 stages:
   - image
 
+variables:
+  BUILD:
+    value: debug_tools
+    description: "Path to folder contains Dockerfile"
+  TAG:
+    value: ""
+    description: "Build tag"
+
 build custom image:
   stage: image
-  image: docker:23.0.6
+  image: docker:26.1.4
   rules:
     - if: $CI_COMMIT_REF_NAME =~ "master" && $BUILD && $TAG
       variables:
