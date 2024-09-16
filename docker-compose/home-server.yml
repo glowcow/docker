@@ -4,8 +4,8 @@ x-var:
     deploy:
       resources:
         limits:
-          cpus: '2'
-          memory: 1536M
+          cpus: '3'
+          memory: 3072M
         reservations:
           cpus: '0.15'
           memory: 256M
@@ -65,6 +65,18 @@ x-var:
   transmission:
     &transmission
     image: glowcow/transmission:3.00
+  immich_server:
+    &immich_server
+    image: ghcr.io/immich-app/immich-server:v1.115.0
+  immich-machine-learning:
+    &immich-machine-learning
+    image: ghcr.io/immich-app/immich-machine-learning:v1.115.0
+  immich_redis:
+    &immich_redis
+    image: docker.io/redis:6.2-alpine
+  immich_postgres:
+    &immich_postgres
+    image: docker.io/tensorchord/pgvecto-rs:pg14-v0.2.0
 
 services:
   dashboard:
@@ -402,6 +414,7 @@ services:
       - transmission
       - victoriametrics
       - minio
+      - immich_server
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.entrypoints=web"
@@ -470,6 +483,84 @@ services:
       - "traefik.http.routers.tm-secure.tls.certresolver=wildcard-namecheap"
       - "traefik.http.routers.tm-secure.tls.domains[0].main=pi.glowcow.xyz"
       - "traefik.http.routers.tm-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
+  immich_server:
+    <<:
+      - *immich_server
+      - *resources
+    container_name: immich_server_dc
+    env_file:
+      - .immich.env
+    # extends:
+    #   file: hwaccel.transcoding.yml
+    #   service: cpu # set to one of [nvenc, quicksync, rkmpp, vaapi, vaapi-wsl] for accelerated transcoding
+    volumes:
+      - /nas/Immich:/usr/src/app/upload
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    depends_on:
+      - immich_redis
+      - immich_postgres
+    healthcheck:
+      disable: false
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.im.entrypoints=web"
+      - "traefik.http.routers.im.rule=Host(`im.pi.glowcow.xyz`)"
+      - "traefik.http.routers.im.middlewares=https-redirect"
+      - "traefik.http.routers.im-secure.entrypoints=websecure"
+      - "traefik.http.routers.im-secure.rule=Host(`im.pi.glowcow.xyz`)"
+      - "traefik.http.routers.im-secure.tls=true"
+      - "traefik.http.routers.im-secure.tls.certresolver=wildcard-namecheap"
+      - "traefik.http.routers.im-secure.tls.domains[0].main=pi.glowcow.xyz"
+      - "traefik.http.routers.im-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
+  immich-machine-learning:
+    <<:
+      - *immich-machine-learning
+      - *resources
+    container_name: immich-machine-learning_dc
+    env_file:
+      - .immich.env
+    # For hardware acceleration, add one of -[armnn, cuda, openvino] to the image tag.
+    # Example tag: ${IMMICH_VERSION:-release}-cuda
+    # extends: # uncomment this section for hardware acceleration - see https://immich.app/docs/features/ml-hardware-acceleration
+    #   file: hwaccel.ml.yml
+    #   service: cpu # set to one of [armnn, cuda, openvino, openvino-wsl] for accelerated inference - use the `-wsl` version for WSL2 where applicable
+    volumes:
+      - /docker_apps/immich/immich-machine-learning/:/cache
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    healthcheck:
+      disable: false
+  immich_redis:
+    <<:
+      - *immich_redis
+      - *resources
+    container_name: immich_redis_dc
+    volumes:
+      - /docker_apps/immich/redis/data:/data
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    healthcheck:
+      test: redis-cli ping || exit 1
+  immich_postgres:
+    <<:
+      - *immich_postgres
+      - *resources
+    container_name: immich_postgres_dc
+    environment:
+      POSTGRES_INITDB_ARGS: '--data-checksums'
+    env_file:
+      - .immich.postgres.env
+    volumes:
+      - /docker_apps/immich/database/:/var/lib/postgresql/data
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    healthcheck:
+      test: pg_isready --dbname='immich' --username='postgres' || exit 1; Chksum="$$(psql --dbname='immich' --username='postgres' --tuples-only --no-align --command='SELECT COALESCE(SUM(checksum_failures), 0) FROM pg_stat_database')"; echo "checksum failure count is $$Chksum"; [ "$$Chksum" = '0' ] || exit 1
+      interval: 5m
+      start_interval: 30s
+      start_period: 5m
+    command: ["postgres", "-c", "shared_preload_libraries=vectors.so", "-c", 'search_path="$$user", public, vectors', "-c", "logging_collector=on", "-c", "max_wal_size=2GB", "-c", "shared_buffers=512MB", "-c", "wal_compression=on"]
 
 networks:
   pi_services:
