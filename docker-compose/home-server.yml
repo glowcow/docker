@@ -65,6 +65,9 @@ x-var:
   transmission:
     &transmission
     image: glowcow/transmission:3.00
+  plex:
+    &plex
+    image: plexinc/pms-docker:1.41.0.8992-8463ad060
   immich_server:
     &immich_server
     image: ghcr.io/immich-app/immich-server:v1.115.0
@@ -414,6 +417,7 @@ services:
       - transmission
       - victoriametrics
       - minio
+      - plex
       - immich_server
     labels:
       - "traefik.enable=true"
@@ -483,6 +487,34 @@ services:
       - "traefik.http.routers.tm-secure.tls.certresolver=wildcard-namecheap"
       - "traefik.http.routers.tm-secure.tls.domains[0].main=pi.glowcow.xyz"
       - "traefik.http.routers.tm-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
+  plex:
+    <<:
+      - *plex
+      - *resources
+    container_name: plex_dc
+    env_file:
+      - .plex.env
+    hostname: plex.pi.glowcow.xyz
+    devices:
+      - /dev/dri:/dev/dri
+    volumes:
+      - /docker_apps/plex/config:/config
+      - /tmp/:/transcode
+      - /nas/Downloads:/data
+    ports:
+      - 32400:32400
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.plex.loadbalancer.server.port=32400"
+      - "traefik.http.routers.plex.entrypoints=web"
+      - "traefik.http.routers.plex.rule=Host(`plex.pi.glowcow.xyz`)"
+      - "traefik.http.routers.plex.middlewares=https-redirect"
+      - "traefik.http.routers.plex-secure.entrypoints=websecure"
+      - "traefik.http.routers.plex-secure.rule=Host(`plex.pi.glowcow.xyz`)"
+      - "traefik.http.routers.plex-secure.tls=true"
+      - "traefik.http.routers.plex-secure.tls.certresolver=wildcard-namecheap"
+      - "traefik.http.routers.plex-secure.tls.domains[0].main=pi.glowcow.xyz"
+      - "traefik.http.routers.plex-secure.tls.domains[0].sans=*.pi.glowcow.xyz"
   immich_server:
     <<:
       - *immich_server
@@ -490,9 +522,8 @@ services:
     container_name: immich_server_dc
     env_file:
       - .immich.env
-    # extends:
-    #   file: hwaccel.transcoding.yml
-    #   service: cpu # set to one of [nvenc, quicksync, rkmpp, vaapi, vaapi-wsl] for accelerated transcoding
+    devices:
+      - /dev/dri:/dev/dri
     volumes:
       - /nas/Immich:/usr/src/app/upload
       - /etc/localtime:/etc/localtime:ro
