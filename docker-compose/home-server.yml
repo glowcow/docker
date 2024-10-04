@@ -19,19 +19,19 @@ x-var:
       PASSWORD: "admin"
   uptime-kuma:
     &uptime-kuma
-    image: louislam/uptime-kuma:1.23.13
+    image: louislam/uptime-kuma:1.23.15
   grafana:
     &grafana
-    image: grafana/grafana-oss:11.1.4
+    image: grafana/grafana-oss:11.1.7
   grafana_renderer:
     &grafana_renderer
-    image: grafana/grafana-image-renderer:3.11.3
+    image: grafana/grafana-image-renderer:3.11.5
   victoriametrics:
     &victoriametrics
     image: victoriametrics/victoria-metrics:v1.97.1
   mongo:
     &mongo
-    image: mongo:5.0.28
+    image: mongo:5.0.29
   elasticsearch:
     &elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
@@ -40,7 +40,7 @@ x-var:
     image: quay.io/prometheuscommunity/elasticsearch-exporter:v1.6.0
   graylog:
     &graylog
-    image: graylog/graylog:5.2.10
+    image: graylog/graylog:5.2.12
   black_box_exporter:
     &black_box_exporter
     image: prom/blackbox-exporter:v0.25.0
@@ -55,10 +55,10 @@ x-var:
     image: minio/minio:RELEASE.2024-06-29T01-20-47Z
   traefik:
     &traefik
-    image: traefik:3.1.2
+    image: traefik:3.1.5
   gitlab_runner:
     &gitlab_runner
-    image: gitlab/gitlab-runner:v17.3.1
+    image: gitlab/gitlab-runner:v17.4.0
   samba:
     &samba
     image: glowcow/samba:4.17.12
@@ -67,13 +67,14 @@ x-var:
     image: glowcow/transmission:3.00
   plex:
     &plex
-    image: plexinc/pms-docker:1.41.0.8992-8463ad060
+    image: plexinc/pms-docker:1.41.0.8994-f2c27da23
+# https://github.com/immich-app/immich/commits/main/docker/docker-compose.yml
   immich_server:
     &immich_server
-    image: ghcr.io/immich-app/immich-server:v1.115.0
+    image: ghcr.io/immich-app/immich-server:v1.117.0
   immich-machine-learning:
     &immich-machine-learning
-    image: ghcr.io/immich-app/immich-machine-learning:v1.115.0
+    image: ghcr.io/immich-app/immich-machine-learning:v1.117.0
   immich_redis:
     &immich_redis
     image: docker.io/redis:6.2-alpine
