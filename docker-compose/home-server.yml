@@ -22,13 +22,13 @@ x-var:
     image: louislam/uptime-kuma:1.23.15
   grafana:
     &grafana
-    image: grafana/grafana-oss:11.1.7
+    image: grafana/grafana-oss:11.1.8
   grafana_renderer:
     &grafana_renderer
-    image: grafana/grafana-image-renderer:3.11.5
+    image: grafana/grafana-image-renderer:3.11.6
   victoriametrics:
     &victoriametrics
-    image: victoriametrics/victoria-metrics:v1.97.1
+    image: victoriametrics/victoria-metrics:v1.102.1
   mongo:
     &mongo
     image: mongo:5.0.29
@@ -49,16 +49,16 @@ x-var:
     image: prom/snmp-exporter:v0.22.0
   cadvisor:
     &cadvisor
-    image: gcr.io/cadvisor/cadvisor-amd64:v0.49.1
+    image: gcr.io/cadvisor/cadvisor-amd64:v0.50.0
   minio:
     &minio
     image: minio/minio:RELEASE.2024-06-29T01-20-47Z
   traefik:
     &traefik
-    image: traefik:3.1.5
+    image: traefik:3.1.6
   gitlab_runner:
     &gitlab_runner
-    image: gitlab/gitlab-runner:v17.4.0
+    image: gitlab/gitlab-runner:v17.5.2
   samba:
     &samba
     image: glowcow/samba:4.17.12
@@ -67,14 +67,14 @@ x-var:
     image: glowcow/transmission:3.00
   plex:
     &plex
-    image: plexinc/pms-docker:1.41.0.8994-f2c27da23
+    image: plexinc/pms-docker:1.41.1.9057-af5eaea7a
 # https://github.com/immich-app/immich/commits/main/docker/docker-compose.yml
   immich_server:
     &immich_server
-    image: ghcr.io/immich-app/immich-server:v1.117.0
+    image: ghcr.io/immich-app/immich-server:v1.118.2
   immich-machine-learning:
     &immich-machine-learning
-    image: ghcr.io/immich-app/immich-machine-learning:v1.117.0
+    image: ghcr.io/immich-app/immich-machine-learning:v1.118.2
   immich_redis:
     &immich_redis
     image: docker.io/redis:6.2-alpine
