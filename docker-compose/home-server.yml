@@ -22,7 +22,7 @@ x-var:
     image: louislam/uptime-kuma:1.23.16
   grafana:
     &grafana
-    image: grafana/grafana-oss:11.3.3
+    image: grafana/grafana-oss:11.3.4
   grafana_renderer:
     &grafana_renderer
     image: grafana/grafana-image-renderer:3.12.1
@@ -55,7 +55,7 @@ x-var:
     image: minio/minio:RELEASE.2025-02-07T23-21-09Z
   traefik:
     &traefik
-    image: traefik:3.3.3
+    image: traefik:3.3.4
   gitlab_runner:
     &gitlab_runner
     image: gitlab/gitlab-runner:v17.8.3
@@ -67,14 +67,14 @@ x-var:
     image: glowcow/transmission:3.00
   plex:
     &plex
-    image: plexinc/pms-docker:1.41.3.9314-a0bfb8370
+    image: plexinc/pms-docker:1.41.5.9522-a96edc606
 # https://github.com/immich-app/immich/commits/main/docker/docker-compose.yml
   immich_server:
     &immich_server
-    image: ghcr.io/immich-app/immich-server:v1.126.1
+    image: ghcr.io/immich-app/immich-server:v1.129.0
   immich-machine-learning:
     &immich-machine-learning
-    image: ghcr.io/immich-app/immich-machine-learning:v1.126.1
+    image: ghcr.io/immich-app/immich-machine-learning:v1.129.0
   immich_redis:
     &immich_redis
     image: docker.io/redis:6.2-alpine
