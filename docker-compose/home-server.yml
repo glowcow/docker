@@ -22,10 +22,10 @@ x-var:
     image: louislam/uptime-kuma:1.23.16
   grafana:
     &grafana
-    image: grafana/grafana-oss:11.3.4
+    image: grafana/grafana-oss:11.4.3
   grafana_renderer:
     &grafana_renderer
-    image: grafana/grafana-image-renderer:3.12.1
+    image: grafana/grafana-image-renderer:3.12.4
   victoriametrics:
     &victoriametrics
     image: victoriametrics/victoria-metrics:v1.102.1
@@ -55,10 +55,10 @@ x-var:
     image: minio/minio:RELEASE.2025-02-07T23-21-09Z
   traefik:
     &traefik
-    image: traefik:3.3.4
+    image: traefik:3.3.5
   gitlab_runner:
     &gitlab_runner
-    image: gitlab/gitlab-runner:v17.8.3
+    image: gitlab/gitlab-runner:v17.8.5
   samba:
     &samba
     image: glowcow/samba:4.17.12
@@ -71,10 +71,10 @@ x-var:
 # https://github.com/immich-app/immich/commits/main/docker/docker-compose.yml
   immich_server:
     &immich_server
-    image: ghcr.io/immich-app/immich-server:v1.129.0
+    image: ghcr.io/immich-app/immich-server:v1.131.2
   immich-machine-learning:
     &immich-machine-learning
-    image: ghcr.io/immich-app/immich-machine-learning:v1.129.0
+    image: ghcr.io/immich-app/immich-machine-learning:v1.131.2
   immich_redis:
     &immich_redis
     image: docker.io/redis:6.2-alpine
@@ -589,22 +589,12 @@ services:
       - /etc/timezone:/etc/timezone:ro
     healthcheck:
       test: >-
-        pg_isready --dbname="$${POSTGRES_DB}" --username="$${POSTGRES_USER}" || exit 1;
-        Chksum="$$(psql --dbname="$${POSTGRES_DB}" --username="$${POSTGRES_USER}" --tuples-only --no-align
-        --command='SELECT COALESCE(SUM(checksum_failures), 0) FROM pg_stat_database')";
-        echo "checksum failure count is $$Chksum";
-        [ "$$Chksum" = '0' ] || exit 1
+        pg_isready --dbname="$${POSTGRES_DB}" --username="$${POSTGRES_USER}" || exit 1; Chksum="$$(psql --dbname="$${POSTGRES_DB}" --username="$${POSTGRES_USER}" --tuples-only --no-align --command='SELECT COALESCE(SUM(checksum_failures), 0) FROM pg_stat_database')"; echo "checksum failure count is $$Chksum"; [ "$$Chksum" = '0' ] || exit 1
       interval: 5m
       start_interval: 30s
       start_period: 5m
     command: >-
-      postgres
-      -c shared_preload_libraries=vectors.so
-      -c 'search_path="$$user", public, vectors'
-      -c logging_collector=on
-      -c max_wal_size=2GB
-      -c shared_buffers=512MB
-      -c wal_compression=on
+      postgres -c shared_preload_libraries=vectors.so -c 'search_path="$$user", public, vectors' -c logging_collector=on -c max_wal_size=2GB -c shared_buffers=512MB -c wal_compression=on
 
 networks:
   pi_services:
