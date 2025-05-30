@@ -22,10 +22,10 @@ x-var:
     image: louislam/uptime-kuma:1.23.16
   grafana:
     &grafana
-    image: grafana/grafana-oss:11.5.5
+    image: grafana/grafana-oss:11.6.2
   grafana_renderer:
     &grafana_renderer
-    image: grafana/grafana-image-renderer:3.12.4
+    image: grafana/grafana-image-renderer:3.12.6
   victoriametrics:
     &victoriametrics
     image: victoriametrics/victoria-metrics:v1.102.1
@@ -158,6 +158,9 @@ services:
       - *grafana_renderer
       - *resources
     container_name: grafana_renderer_dc
+    environment:
+      - ENABLE_METRICS=true
+      - HTTP_HOST=0.0.0.0
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
