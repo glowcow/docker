@@ -67,14 +67,14 @@ x-var:
     image: glowcow/transmission:3.00
   plex:
     &plex
-    image: plexinc/pms-docker:1.41.7.9799-5bce000f7
+    image: plexinc/pms-docker:1.41.7.9823-59f304c16
 # https://github.com/immich-app/immich/commits/main/docker/docker-compose.yml
   immich_server:
     &immich_server
-    image: ghcr.io/immich-app/immich-server:v1.133.1
+    image: ghcr.io/immich-app/immich-server:v1.134.0
   immich-machine-learning:
     &immich-machine-learning
-    image: ghcr.io/immich-app/immich-machine-learning:v1.133.1
+    image: ghcr.io/immich-app/immich-machine-learning:v1.134.0
   immich_redis:
     &immich_redis
     image: docker.io/valkey/valkey:8-bookworm
@@ -595,7 +595,3 @@ networks:
   pi_services:
     name: pi_services
     driver: bridge
-    enable_ipv6: true
-    ipam:
-      config:
-        - subnet: 2001:0DB8::/122
