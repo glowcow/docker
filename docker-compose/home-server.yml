@@ -22,10 +22,10 @@ x-var:
     image: louislam/uptime-kuma:1.23.16
   grafana:
     &grafana
-    image: grafana/grafana-oss:11.6.2
+    image: grafana/grafana-oss:11.6.3
   grafana_renderer:
     &grafana_renderer
-    image: grafana/grafana-image-renderer:3.12.6
+    image: grafana/grafana-image-renderer:3.12.9
   victoriametrics:
     &victoriametrics
     image: victoriametrics/victoria-metrics:v1.102.1
@@ -55,10 +55,10 @@ x-var:
     image: minio/minio:RELEASE.2025-05-24T17-08-30Z
   traefik:
     &traefik
-    image: traefik:3.3.7
+    image: traefik:3.4.3
   gitlab_runner:
     &gitlab_runner
-    image: gitlab/gitlab-runner:v18.0.2
+    image: gitlab/gitlab-runner:v18.1.1
   samba:
     &samba
     image: glowcow/samba:4.17.12
@@ -67,20 +67,20 @@ x-var:
     image: glowcow/transmission:3.00
   plex:
     &plex
-    image: plexinc/pms-docker:1.41.7.9823-59f304c16
+    image: plexinc/pms-docker:1.41.8.9834-071366d65
 # https://github.com/immich-app/immich/commits/main/docker/docker-compose.yml
   immich_server:
     &immich_server
-    image: ghcr.io/immich-app/immich-server:v1.134.0
+    image: ghcr.io/immich-app/immich-server:v1.135.3
   immich-machine-learning:
     &immich-machine-learning
-    image: ghcr.io/immich-app/immich-machine-learning:v1.134.0
+    image: ghcr.io/immich-app/immich-machine-learning:v1.135.3
   immich_redis:
     &immich_redis
     image: docker.io/valkey/valkey:8-bookworm
   immich_postgres:
     &immich_postgres
-    image: ghcr.io/immich-app/postgres:14-vectorchord0.3.0-pgvectors0.2.0
+    image: ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0
 
 services:
   dashboard:
@@ -590,6 +590,7 @@ services:
       - /docker_apps/immich/database/:/var/lib/postgresql/data
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
+    shm_size: 128mb
 
 networks:
   pi_services:
